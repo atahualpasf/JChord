@@ -15,75 +15,57 @@ import java.util.Objects;
  * @author Atahualpa Silva F. <https://github.com/atahualpasf>
  * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
  */
-public class Node implements Serializable
-{
+public class Node implements Serializable {
     private Integer key;
     private String myIp;
     private Integer myPort;
 
-    public Node(String myIp, Integer myPort) 
-    {
+    public Node(String myIp, Integer myPort) {
         this.myIp = myIp;
         this.myPort = myPort;
-        this.setKey(this.hashCode());
     }
 
-    public Integer getKey() 
-    {
+    public Integer getKey() {
         return key;
     }
 
-    public void setKey(Integer key) 
-    {
+    public void setKey(Integer key) {
         this.key = key;
     }
 
-    public String getMyIp() 
-    {
+    public String getMyIp() {
         return myIp;
     }
 
-    public void setMyIp(String myIp) 
-    {
+    public void setMyIp(String myIp) {
         this.myIp = myIp;
     }
 
-    public Integer getMyPort() 
-    {
+    public Integer getMyPort() {
         return myPort;
     }
 
-    public void setMyPort(Integer myPort) 
-    {
+    public void setMyPort(Integer myPort) {
         this.myPort = myPort;
     }
 
     @Override
-    public int hashCode() 
-    {
-        int hash = 1;
-        hash = hash * Objects.hashCode(this.myIp);
-        hash = hash * Objects.hashCode(this.myPort);
-        hash = (hash & 0x7FFFFFFF) % Util.MAX_NODES;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) 
-    {
-        if (obj == null) 
-        {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) 
-        {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         final Node other = (Node) obj;
-        if (!Objects.equals(this.key, other.key)) 
-        {
+        if (!Objects.equals(this.key, other.key)) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" + "key=" + key + ", myIp=" + myIp + ", myPort=" + myPort + '}';
     }
 }

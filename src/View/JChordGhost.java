@@ -28,7 +28,7 @@ public class JChordGhost {
         // TODO code application logic here
         
         try {
-            ghostServer = new ServerSocket(Util.MY_PORT, 8, InetAddress.getByName(Util.getMyIp()));
+            ghostServer = new ServerSocket(Util.GHOST_PORT, 8, InetAddress.getByName(Util.getMyIp()));
             showServerMessage(true);
             System.out.println(ANSI_BLUE + "INFORMACIÓN:" + ANSI_RESET + " Servidor -> " + ghostServer.getInetAddress().getHostAddress() + ":" + ghostServer.getLocalPort());
             while (true) 

@@ -5,7 +5,9 @@
  */
 package View;
 
+import Controller.JChordController;
 import Controller.Util;
+import Model.Node;
 
 /**
  *
@@ -39,7 +41,7 @@ public class JChord {
             switch(option) 
             {
                 case 1: Util.cls();
-                        System.out.println("Hola");
+                        JChordController.joinRing(Util.getMyIp(), Util.MY_PORT);
                         break;
                 case 3: Util.cls();
                         System.out.println("Chao");

@@ -6,11 +6,13 @@
 
 package Controller;
 
+import Model.Node;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Objects;
 
 /**
  *
@@ -21,9 +23,11 @@ public class Util {
     // Constantes de aplicación
     public static Integer MAX_NODES = null;
     private static final Integer M_BITS = 8;
-    public static final Integer GHOST_PORT = 5555;
     private static String MY_IP = null;
     public static final Integer MY_PORT = 4444;
+    public static final String GHOST_IP = "192.168.0.110";
+    public static final Integer GHOST_PORT = 5555;
+    public static final String DELIMETER = ":";
     // Constantes para mostrar colores en la consola
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -76,5 +80,13 @@ public class Util {
             }
         }
         return MY_IP;
+    }
+    
+    public static int hashCode(Node node) {
+        int hash = 1;
+        hash = hash * Objects.hashCode(node.getMyIp());
+        hash = hash * Objects.hashCode(node.getMyPort());
+        hash = (hash & 0x7FFFFFFF) % Util.MAX_NODES;
+        return hash;
     }
 }
