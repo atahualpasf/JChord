@@ -26,19 +26,29 @@ public class JChordController {
     private static ObjectOutputStream outputObject = null;
     private static ObjectInputStream inputObject = null;
     
-    public static void joinRing(String myIp, Integer myPort) throws ClassNotFoundException {
+    public static void joinRing(String myIp, Integer myPort) {
         try {
-            connection = new Socket(Util.GHOST_IP, Util.GHOST_PORT);
-            outputObject = new ObjectOutputStream(connection.getOutputStream());
-            inputObject = new ObjectInputStream(connection.getInputStream());
-            Node me = new Node(myIp, myPort);
-            me.setKey(Util.hashCode(me));
-            StandardObject standardObject = new StandardObject(null, me, true)
-                    .buildProtocol(Arrays.asList("1","JOIN"));
-            outputObject.writeObject(standardObject);
-            System.out.println((String) inputObject.readObject());
-            connection.close();
+            if (Data.getMyNode() == null) {
+                connection = new Socket(Util.GHOST_IP, Util.GHOST_PORT);
+                outputObject = new ObjectOutputStream(connection.getOutputStream());
+                inputObject = new ObjectInputStream(connection.getInputStream());
+                Node me = new Node(myIp, myPort);
+                me.setKey(Util.hashCode(me));
+                StandardObject standardObject = new StandardObject(me, true)
+                        .buildProtocol(Arrays.asList("1","JOIN"));
+                outputObject.writeObject(standardObject);
+                standardObject = (StandardObject) inputObject.readObject();
+                System.out.println(standardObject);
+                if (standardObject.isSuccess()) {
+                    Data.setMyNode((Node) standardObject.getObject());
+                }
+                connection.close();
+            } else {
+                System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Su sesión ya está activa.");
+            }
         } catch (IOException ex) {
+            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
         }
         

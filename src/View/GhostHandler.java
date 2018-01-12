@@ -6,12 +6,15 @@
 
 package View;
 
-import Controller.JChordGhostController;
 import Controller.Util;
+import Model.Node;
 import Model.StandardObject;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -21,11 +24,14 @@ import java.net.Socket;
 public class GhostHandler extends Thread {
     private final Socket ghostClient;
     private StandardObject clientRequest = null;
+    private StandardObject serverRequest = null;
     private ObjectInputStream objectFromClient = null;
     private ObjectOutputStream objectToClient = null;
+    private List<Node> ring = null;
 
-    public GhostHandler(Socket ghostClient) {
+    public GhostHandler(Socket ghostClient, List<Node> ring) {
         this.ghostClient = ghostClient;
+        this.ring = ring;
     }
     
     @Override
@@ -36,11 +42,27 @@ public class GhostHandler extends Thread {
             objectToClient = new ObjectOutputStream(ghostClient.getOutputStream());
             while (true) {
                 clientRequest = (StandardObject) objectFromClient.readObject();
+                System.out.println(clientRequest);
                 String protocol[] = clientRequest.getProtocol().split(Util.DELIMETER);
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":
-                            objectToClient.writeObject("ENTRO");
+                            Node newNode = (Node) clientRequest.getObject();
+                            ring.add(newNode);
+                            
+                            Collections.sort(ring, (a,b) -> a.getKey().compareTo(b.getKey()));
+                            int sizeOfRing = ring.size();
+                            // El anillo estaba vacío, ahora está únicamente el nuevo | PRE y SUC son vacíos
+                            if (sizeOfRing == 1) {
+                                serverRequest = new StandardObject(newNode, true);
+                            } else {
+                                int newIndex = ring.indexOf(newNode);
+                                newNode.setPredecessor(ring.get((newIndex-1 < 0) ? newIndex : newIndex-1));
+                                newNode.setSuccessor(ring.get((newIndex+1 > sizeOfRing) ? newIndex : newIndex+1));
+                                serverRequest = new StandardObject(newNode, true);
+                            }
+                            objectToClient.writeObject(serverRequest);
+                            //objectToClient.writeObject("ENTRO");
                             break;
                         case "LEAVE":
                             //JChordGhostController.leaveRing();
@@ -54,9 +76,11 @@ public class GhostHandler extends Thread {
                 }
             }
         }
-        catch(Exception e)
-        {
-            System.out.print(Util.ANSI_RED + "EXCEPTION: ");
+        catch (ClassNotFoundException e) {
+            System.out.print(Util.ANSI_RED + "EXCEPTION: ClassNotFoundException ");
+            System.out.println(Util.ANSI_RESET + e.getMessage());
+        } catch(IOException e) {
+            System.out.print(Util.ANSI_RED + "EXCEPTION: IOException ");
             System.out.println(Util.ANSI_RESET + e.getMessage());
         }
     }

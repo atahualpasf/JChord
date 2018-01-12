@@ -6,7 +6,6 @@
 
 package Model;
 
-import Controller.Util;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -19,6 +18,8 @@ public class Node implements Serializable {
     private Integer key;
     private String myIp;
     private Integer myPort;
+    private Node successor = null;
+    private Node predecessor = null;
 
     public Node(String myIp, Integer myPort) {
         this.myIp = myIp;
@@ -49,6 +50,24 @@ public class Node implements Serializable {
         this.myPort = myPort;
     }
 
+    public Node getSuccessor() {
+        return successor;
+    }
+
+    public void setSuccessor(Node successor) {
+        if (!successor.equals(this))
+            this.successor = successor;
+    }
+
+    public Node getPredecessor() {
+        return predecessor;
+    }
+
+    public void setPredecessor(Node predecessor) {
+        if (!predecessor.equals(this))
+            this.predecessor = predecessor;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -66,6 +85,8 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return "Node{" + "key=" + key + ", myIp=" + myIp + ", myPort=" + myPort + '}';
+        return "Node{" + "key=" + key + ", myIp=" + myIp + ", myPort=" + myPort + ", successor=" + successor + ", predecessor=" + predecessor + '}';
     }
+
+    
 }

@@ -8,10 +8,13 @@ package View;
 import Controller.Util;
 import static Controller.Util.ANSI_BLUE;
 import static Controller.Util.ANSI_RESET;
+import Model.Node;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -20,6 +23,7 @@ import java.net.Socket;
 public class JChordGhost {
     private static ServerSocket ghostServer;
     private static Socket ghostClient;
+    private static List<Node> ring;
 
     /**
      * @param args the command line arguments
@@ -31,11 +35,12 @@ public class JChordGhost {
             ghostServer = new ServerSocket(Util.GHOST_PORT, 8, InetAddress.getByName(Util.getMyIp()));
             showServerMessage(true);
             System.out.println(ANSI_BLUE + "INFORMACIÓN:" + ANSI_RESET + " Servidor -> " + ghostServer.getInetAddress().getHostAddress() + ":" + ghostServer.getLocalPort());
+            ring = new ArrayList<>();
             while (true) 
             {
                 ghostClient = ghostServer.accept();
                 System.out.println(ANSI_BLUE + "INFORMACIÓN:" + ANSI_RESET + " Cliente -> " + ghostClient.getInetAddress().getHostAddress() + ":" + ghostClient.getPort());
-                new GhostHandler(ghostClient).start();
+                new GhostHandler(ghostClient, ring).start();
             }
         } catch (IOException ex) {
             System.out.print(Util.ANSI_RED + "EXCEPTION: ");

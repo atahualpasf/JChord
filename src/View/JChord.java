@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Data;
 import Controller.JChordController;
 import Controller.Util;
 import Model.Node;
@@ -19,7 +20,7 @@ public class JChord {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
         // TODO code application logic here
         Util.calculateMaxNodes();
         while (true) {
@@ -44,6 +45,7 @@ public class JChord {
                         JChordController.joinRing(Util.getMyIp(), Util.MY_PORT);
                         break;
                 case 3: Util.cls();
+                        System.out.println(Data.getMyNode());
                         System.out.println("Chao");
                         break;
             }

@@ -6,11 +6,21 @@
 
 package Controller;
 
+import Model.Node;
+
 /**
  *
  * @author Atahualpa Silva F. <https://github.com/atahualpasf>
  * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
  */
-public class JChordGhostController {
+public class Data {
+    private static Node me = null;
 
+    public static Node getMyNode() {
+        return me;
+    }
+    
+    public static void setMyNode(Node me) {
+        Data.me = me;
+    }
 }

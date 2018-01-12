@@ -25,6 +25,11 @@ public class StandardObject implements Serializable {
         this.object = object;
     }
     
+    public StandardObject(Object object, boolean success) {
+        this.object = object;
+        this.success = success;
+    }
+    
     public StandardObject(String protocol, Object object, boolean success) {
         this.protocol = protocol;
         this.object = object;
