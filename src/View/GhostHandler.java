@@ -6,6 +6,7 @@
 
 package View;
 
+import Controller.GhostHandlerController;
 import Controller.Util;
 import Model.Node;
 import Model.StandardObject;
@@ -47,35 +48,10 @@ public class GhostHandler extends Thread {
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":
-                            Node newNode = (Node) clientRequest.getObject();
-                            ring.add(newNode);
-                            
-                            Collections.sort(ring, (a,b) -> a.getKey().compareTo(b.getKey()));
-                            int sizeOfRing = ring.size();
-                            // El anillo estaba vacío, ahora está únicamente el nuevo | PRE y SUC son vacíos
-                            if (sizeOfRing == 1) {
-                                serverReply = new StandardObject(newNode, true);
-                            } else {
-                                int newIndex = ring.indexOf(newNode);
-                                Node updatedNode = new Node(newNode);
-                                updatedNode.setPredecessor(ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1));
-                                updatedNode.setSuccessor(ring.get((newIndex+1 == sizeOfRing) ? 0 : newIndex+1));
-                                serverReply = new StandardObject(updatedNode, true);
-                            }
-                            objectToClient.writeObject(serverReply);
+                            GhostHandlerController.joinRing(clientRequest, ring, objectToClient);
                             break;
                         case "LEAVE":
-                            Node oldNode = (Node) clientRequest.getObject();
-                            ring.remove(oldNode);
-                            String command = null;
-                            if (ring.size() == 1) {
-                                command = "ONLYONE";
-                            } else if (ring.isEmpty()) {
-                                command = "EMPTY";
-                            }
-                            serverReply = new StandardObject(command, oldNode, true);
-                            objectToClient.writeObject(serverReply);
-                            break;
+                            GhostHandlerController.leaveRing(clientRequest, ring, objectToClient);
                         case "3":
                             //JChordGhostController.saveArchives();
                             break;

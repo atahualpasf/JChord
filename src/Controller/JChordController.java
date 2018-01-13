@@ -101,7 +101,7 @@ public class JChordController {
     }
     
     private static void updateOnlyOne(Node me) {
-        try {;
+        try {
             Node nodeToUpdate = me.getPredecessor();
             openConnection(nodeToUpdate.getIp(), nodeToUpdate.getPort());
             StandardObject request = new StandardObject(me, true)
