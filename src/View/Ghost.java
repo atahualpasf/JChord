@@ -43,11 +43,13 @@ public class Ghost {
             int option;
             ghostMenu = new Menu("GHOST");
             ghostMenu.putAction("SHOW STATUS", () -> {GhostController.showStatusNetwork(ring);});
-            System.out.println(ghostMenu.generateText());
             while (wannaRun) {
                 // TODO some error checking.
+                System.out.println(ghostMenu.generateText());
                 option = KeyIn.inInt("|\t\t   YOUR OPTION ->");
+                System.out.println("");
                 ghostMenu.executeAction(option);
+                Util.smallCls();
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Ghost.class.getName()).log(Level.SEVERE, null, ex);
