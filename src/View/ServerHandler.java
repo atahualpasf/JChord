@@ -44,7 +44,7 @@ public class ServerHandler extends Thread {
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":
-                            Node newNode = (Node) clientRequest.getObject();                            
+                            Node newNode = new Node((Node) clientRequest.getObject());
                             switch(protocol[2]) {
                                 case "PREDECESSOR":
                                     Data.getMyNode().setSuccessor(newNode);
@@ -55,7 +55,19 @@ public class ServerHandler extends Thread {
                             }
                             break;
                         case "LEAVE":
-                            //JChordGhostController.leaveRing();
+                            Node oldNode = (Node) clientRequest.getObject();
+                            switch(protocol[2]) {
+                                case "PREDECESSOR":
+                                    Data.getMyNode().setSuccessor(oldNode.getSuccessor());
+                                    break;
+                                case "SUCCESSOR":
+                                    Data.getMyNode().setPredecessor(oldNode.getPredecessor());
+                                    break;
+                                case "ONLYONE":
+                                    Data.getMyNode().clearPredecessor();
+                                    Data.getMyNode().clearSuccessor();
+                                    break;
+                            }
                             break;
                         case "3":
                             //JChordGhostController.saveArchives();

@@ -22,7 +22,7 @@ public class StandardObject implements Serializable {
 
     public StandardObject(String protocol, boolean success) {
         this.protocol = protocol;
-        this.object = object;
+        this.success = success;
     }
     
     public StandardObject(Object object, boolean success) {

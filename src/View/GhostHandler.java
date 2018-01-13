@@ -60,11 +60,21 @@ public class GhostHandler extends Thread {
                                 Node updatedNode = new Node(newNode);
                                 updatedNode.setPredecessor(ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1));
                                 updatedNode.setSuccessor(ring.get((newIndex+1 == sizeOfRing) ? 0 : newIndex+1));
+                                serverReply = new StandardObject(updatedNode, true);
                             }
                             objectToClient.writeObject(serverReply);
                             break;
                         case "LEAVE":
-                            //JChordGhostController.leaveRing();
+                            Node oldNode = (Node) clientRequest.getObject();
+                            ring.remove(oldNode);
+                            String command = null;
+                            if (ring.size() == 1) {
+                                command = "ONLYONE";
+                            } else if (ring.isEmpty()) {
+                                command = "EMPTY";
+                            }
+                            serverReply = new StandardObject(command, oldNode, true);
+                            objectToClient.writeObject(serverReply);
                             break;
                         case "3":
                             //JChordGhostController.saveArchives();

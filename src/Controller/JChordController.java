@@ -26,11 +26,11 @@ public class JChordController {
     private static ObjectOutputStream outputObject = null;
     private static ObjectInputStream inputObject = null;
     
-    public static void joinRing(String myIp, Integer myPort) {
-        try {
-            if (Data.getMyNode() == null) {
+    public static void joinRing() {
+        if (Data.getMyNode() == null) {
+            try {
                 openConnection(Util.GHOST_IP, Util.GHOST_PORT);
-                Node me = new Node(myIp, myPort);
+                Node me = new Node(Util.getMyIp(), Util.MY_PORT);
                 me.setKey(Util.hashCode(me));
                 StandardObject request = new StandardObject(me, true)
                         .buildProtocol(Arrays.asList("1","JOIN"));
@@ -38,33 +38,74 @@ public class JChordController {
                 request = (StandardObject) inputObject.readObject();
                 System.out.println(request);
                 if (request.isSuccess()) {
-                    Data.setMyNode((Node) request.getObject());
+                    me = (Node) request.getObject();
+                    Data.setMyNode(me);
                 }
                 connection.close();
-                Node predecessor = Data.getMyNode().getPredecessor();
-                Node successor = Data.getMyNode().getSuccessor();
-                if (predecessor != null) joinNode(predecessor, true);
-                if (successor != null) joinNode(successor, false);
-            } else {
-                System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Su sesión ya está activa.");
+                if (me.getPredecessor() != null) updateNodeRelations(me, true, true);
+                if (me.getSuccessor() != null) updateNodeRelations(me, true, false);
+            } catch (IOException ex) {
+                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (IOException ex) {
-            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        } else {
+            System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Su sesión ya está activa.");
+        }        
     }
     
-    public static void joinNode(Node nodeToJoin, boolean isPredecessor) {
+    public static void leaveRing() {
+        if (Data.getMyNode() != null) {
+            try {
+                openConnection(Util.GHOST_IP, Util.GHOST_PORT);
+                Node me = Data.getMyNode();
+                StandardObject request = new StandardObject(me, true)
+                        .buildProtocol(Arrays.asList("2","LEAVE"));
+                outputObject.writeObject(request);
+                request = (StandardObject) inputObject.readObject();
+                System.out.println(request);
+                if (request.isSuccess()) {
+                    Data.setMyNode(null);
+                }
+                connection.close();
+                if (request.getProtocol() == null) {
+                    updateNodeRelations(me, false, true);
+                    updateNodeRelations(me, false, false);
+                } else if (request.getProtocol().equalsIgnoreCase("ONLYONE")) {
+                    updateOnlyOne(me);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
+        }
+    }
+    
+    private static void updateNodeRelations(Node me, boolean isJoin, boolean isPredecessor) {
         try {
-            openConnection(nodeToJoin.getIp(), nodeToJoin.getPort());
-            Node me = new Node(Data.getMyNode());
-            StandardObject request = (isPredecessor) ? 
-                    new StandardObject(me, true)
-                    .buildProtocol(Arrays.asList("1","JOIN","PREDECESSOR")) : 
-                    new StandardObject(me, true)
-                    .buildProtocol(Arrays.asList("1","JOIN","SUCCESSOR"));
+            String operation = (isJoin) ? "1" : "2";
+            String command = (isJoin) ? "JOIN" : "LEAVE";
+            String type = (isPredecessor) ? "PREDECESSOR" : "SUCCESSOR";
+            Node nodeToUpdate = (isPredecessor) ? me.getPredecessor() : me.getSuccessor() ;
+            openConnection(nodeToUpdate.getIp(), nodeToUpdate.getPort());
+            StandardObject request = new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList(operation,command,type));
+            outputObject.writeObject(request);
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static void updateOnlyOne(Node me) {
+        try {;
+            Node nodeToUpdate = me.getPredecessor();
+            openConnection(nodeToUpdate.getIp(), nodeToUpdate.getPort());
+            StandardObject request = new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList("21","LEAVE","ONLYONE"));
             outputObject.writeObject(request);
             connection.close();
         } catch (IOException ex) {

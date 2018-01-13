@@ -64,6 +64,10 @@ public class Node implements Serializable {
         if (!successor.equals(this))
             this.successor = successor;
     }
+    
+    public void clearSuccessor() {
+        this.successor = null;
+    }
 
     public Node getPredecessor() {
         return predecessor;
@@ -72,6 +76,10 @@ public class Node implements Serializable {
     public void setPredecessor(Node predecessor) {
         if (!predecessor.equals(this))
             this.predecessor = predecessor;
+    }
+    
+    public void clearPredecessor() {
+        this.predecessor = null;
     }
 
     @Override

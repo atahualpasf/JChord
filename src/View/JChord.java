@@ -8,7 +8,6 @@ package View;
 import Controller.Data;
 import Controller.JChordController;
 import Controller.Util;
-import Model.Node;
 
 /**
  *
@@ -45,10 +44,10 @@ public class JChord {
             switch(option) 
             {
                 case 1: Util.cls();
-                        JChordController.joinRing(Util.getMyIp(), Util.MY_PORT);
+                        JChordController.joinRing();
                         break;
                 case 2: Util.cls();
-                        System.out.println("LEAVE RING");
+                        JChordController.leaveRing();
                         break;
                 case 3: Util.cls();
                         System.out.println(Data.getMyNode());

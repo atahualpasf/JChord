@@ -24,7 +24,7 @@ public class Util {
     public static Integer MAX_NODES = null;
     private static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4446;
+    public static final Integer MY_PORT = 4448;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String DELIMETER = ":";
