@@ -20,11 +20,20 @@ import java.util.Objects;
  * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
  */
 public class Util {
+    // Constantes de os
+    private static String OS = null;
+    private static final String LW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\LOCAL";
+    private static final String DW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\DOWNLOAD";
+    private static final String LL_FILES_PATH = "/home/atahualpasf/Documents/SD/LOCAL";
+    private static final String DL_FILES_PATH = "/home/atahualpasf/Documents/SD/DOWNLOAD";
+    private static final String W_DIR_SEPARATOR = "\\";
+    private static final String L_DIR_SEPARATOR = "/";
+    
     // Constantes de aplicación
     public static Integer MAX_NODES = null;
     private static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4446;
+    public static final Integer MY_PORT = 4444;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String DELIMETER = ":";
@@ -39,6 +48,27 @@ public class Util {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
     public static final int MENU_TITLE_LENGTH = 14;
+    
+    private static String getOsName() {
+       if(OS == null) { OS = System.getProperty("os.name"); }
+       return OS;
+    }
+    
+    private static boolean isWindows() {
+       return getOsName().startsWith("Windows");
+    }
+    
+    public static String getLocalDirPath() {
+        return (isWindows()) ? LW_FILES_PATH : LL_FILES_PATH;
+    }
+    
+    public static String getDownloadDirPath() {
+        return (isWindows()) ? DW_FILES_PATH : DL_FILES_PATH;
+    }
+    
+    public static String getOsDirSeparator() {
+        return (isWindows()) ? W_DIR_SEPARATOR : L_DIR_SEPARATOR;
+    }
 
     public static void calculateMaxNodes() {
         if (MAX_NODES == null) {
@@ -76,6 +106,13 @@ public class Util {
         int hash = 1;
         hash = hash * Objects.hashCode(node.getIp());
         hash = hash * Objects.hashCode(node.getPort());
+        hash = (hash & 0x7FFFFFFF) % Util.MAX_NODES;
+        return hash;
+    }
+    
+    public static int hashCode(String fileName) {
+        int hash = 1;
+        hash = hash * Objects.hashCode(fileName);
         hash = (hash & 0x7FFFFFFF) % Util.MAX_NODES;
         return hash;
     }

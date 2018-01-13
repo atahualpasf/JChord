@@ -8,6 +8,8 @@ package Controller;
 
 import Model.Node;
 import Model.StandardObject;
+import Model.Archive;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -79,6 +81,33 @@ public class JChordController {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
+        }
+    }
+    
+    public static void loadArchives() {
+        if (Data.getMyNode() != null) {
+            File[] files = new File(Util.getLocalDirPath()).listFiles();        
+            String resource;
+            if (files != null){
+                for (File file : files){
+                    if (file.isFile()){
+                        Archive archive = new Archive(Util.hashCode(file.getName()), file.getName());
+                        Data.getFiles().add(archive);
+                    }
+                }
+            }
+        } else {
+            System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
+        }
+    }
+    
+    public static void showLocalArchives() {
+        if (Data.getMyNode() != null) {
+            Data.getFiles().forEach((archive) -> {
+                System.out.println(archive);
+            });
         } else {
             System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
         }

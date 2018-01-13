@@ -28,19 +28,6 @@ public class Menu {
     public void putAction(String name, Runnable action) {
         actionsMap.put(name, action);
     }
-    
-    /*System.out.println(Util.ANSI_BLUE + "=================================================================");
-    System.out.printf(Util.ANSI_BLUE + "|\t\t\t" + Util.ANSI_RED + "M" + Util.ANSI_RESET + "ENU " + Util.ANSI_RED  + "S" + Util.ANSI_RESET  + "ELECTION " + Util.ANSI_RED  + "D" + Util.ANSI_RESET  + "EMO\t\t\t|\n");
-    System.out.println(Util.ANSI_BLUE + "=================================================================");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "1." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "JOIN RING");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "2." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "LEAVE RING");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "3." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "SHOW INFO");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "4." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "NOT DEFINED");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "5." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "NOT DEFINED");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "6." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "NOT DEFINED");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "7." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "NOT DEFINED");
-    System.out.printf(Util.ANSI_BLUE + "|" + Util.ANSI_RESET + "\t\t" + Util.ANSI_RED + "8." + Util.ANSI_RESET  + " %-25s\t\t\t" + Util.ANSI_BLUE + "|\n", "EXIT");
-    System.out.printf(Util.ANSI_BLUE + "=================================================================\n");*/
 
     public String generateText() {
         StringBuilder stringToShow = new StringBuilder();

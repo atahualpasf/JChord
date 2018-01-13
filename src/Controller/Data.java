@@ -6,7 +6,10 @@
 
 package Controller;
 
+import Model.Archive;
 import Model.Node;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -15,6 +18,7 @@ import Model.Node;
  */
 public class Data {
     private static Node me = null;
+    private static List<Archive> files = new ArrayList<>();
 
     public static Node getMyNode() {
         return me;
@@ -22,5 +26,13 @@ public class Data {
     
     public static void setMyNode(Node me) {
         Data.me = me;
+    }
+
+    public static List<Archive> getFiles() {
+        return files;
+    }
+
+    public static void setFiles(List<Archive> files) {
+        Data.files = files;
     }
 }

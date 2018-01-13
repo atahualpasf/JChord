@@ -81,6 +81,11 @@ public class Node implements Serializable {
     public void clearPredecessor() {
         this.predecessor = null;
     }
+    
+    public void cleanRelations() {
+        this.predecessor = null;
+        this.successor = null;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -100,10 +105,5 @@ public class Node implements Serializable {
     @Override
     public String toString() {
         return "Node{" + "key=" + key + ", myIp=" + ip + ", myPort=" + port + ", successor=" + successor + ", predecessor=" + predecessor + '}';
-    }
-
-    public void cleanRelations() {
-        this.predecessor = null;
-        this.successor = null;
     }
 }
