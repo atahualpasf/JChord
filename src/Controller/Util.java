@@ -24,7 +24,7 @@ public class Util {
     public static Integer MAX_NODES = null;
     private static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4444;
+    public static final Integer MY_PORT = 4446;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String DELIMETER = ":";
@@ -44,17 +44,6 @@ public class Util {
             int i = 2;
             MAX_NODES = (int) Math.pow(i, M_BITS);
         }
-    }
-    
-    public static void cls() {
-        for(int i = 0; i < 25; i++) {
-            System.out.println();
-        }
-    }
-    
-    public static void pause() {
-        System.out.println("Presione cualquier tecla para continuar...");
-        new java.util.Scanner(System.in).nextLine();
     }
     
     public static String getMyIp() {
@@ -84,9 +73,45 @@ public class Util {
     
     public static int hashCode(Node node) {
         int hash = 1;
-        hash = hash * Objects.hashCode(node.getMyIp());
-        hash = hash * Objects.hashCode(node.getMyPort());
+        hash = hash * Objects.hashCode(node.getIp());
+        hash = hash * Objects.hashCode(node.getPort());
         hash = (hash & 0x7FFFFFFF) % Util.MAX_NODES;
         return hash;
     }
+    
+    public static void cls() {
+        for(int i = 0; i < 25; i++) {
+            System.out.println();
+        }
+    }
+    
+    public static void pause() {
+        System.out.println("Presione cualquier tecla para continuar...");
+        new java.util.Scanner(System.in).nextLine();
+    }
+    
+    public static void showServerMessage(String name, boolean start) {
+        name = (name.length() < 5) ? " " + name : name;
+        System.out.println(" ---------------  ");
+        System.out.println("|     " + Util.ANSI_BLUE + name + Util.ANSI_RESET + "     |");
+        System.out.println("|  -----------  |");
+        System.out.println("| |           | |");
+        if (start)
+            System.out.println("| |  ^     ^  | |");
+        else
+            System.out.println("| |  X     X  | |");
+        System.out.println("| |     -     | |");
+        if (start)
+            System.out.println("| |    ---    | |");
+        else
+            System.out.println("| |     O     | |");
+        System.out.println("|  -----------  |");
+        if (start)
+            System.out.println("|" + Util.ANSI_BLUE + " SERVER" + Util.ANSI_RESET + ":" + Util.ANSI_GREEN + "   ON" + Util.ANSI_RESET + "  |");
+        else
+            System.out.println("|" + Util.ANSI_BLUE + " SERVER" + Util.ANSI_RESET + ":" + Util.ANSI_RED + "  OFF" + Util.ANSI_RESET + "  |");
+        System.out.println("| --      ----- |");
+        System.out.println("| " + Util.ANSI_BLUE + Util.getMyIp() + Util.ANSI_RESET + " |");
+        System.out.println(" --------------- ");
+    } 
 }

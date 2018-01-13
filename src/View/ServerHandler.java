@@ -6,6 +6,7 @@
 
 package View;
 
+import Controller.Data;
 import Controller.Util;
 import Model.Node;
 import Model.StandardObject;
@@ -13,33 +14,29 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *
  * @author Atahualpa Silva F. <https://github.com/atahualpasf>
  * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
  */
-public class GhostHandler extends Thread {
-    private final Socket ghostClient;
+public class ServerHandler extends Thread {
+    private final Socket nodeClient;
     private StandardObject clientRequest = null;
     private StandardObject serverReply = null;
     private ObjectInputStream objectFromClient = null;
     private ObjectOutputStream objectToClient = null;
-    private List<Node> ring = null;
-
-    public GhostHandler(Socket ghostClient, List<Node> ring) {
-        this.ghostClient = ghostClient;
-        this.ring = ring;
+    
+    public ServerHandler(Socket nodeClient) {
+        this.nodeClient = nodeClient;
     }
     
     @Override
     public void run()   
     {
         try {
-            objectFromClient = new ObjectInputStream(ghostClient.getInputStream());
-            objectToClient = new ObjectOutputStream(ghostClient.getOutputStream());
+            objectFromClient = new ObjectInputStream(nodeClient.getInputStream());
+            objectToClient = new ObjectOutputStream(nodeClient.getOutputStream());
             while (true) {
                 clientRequest = (StandardObject) objectFromClient.readObject();
                 System.out.println(clientRequest);
@@ -47,21 +44,15 @@ public class GhostHandler extends Thread {
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":
-                            Node newNode = (Node) clientRequest.getObject();
-                            ring.add(newNode);
-                            
-                            Collections.sort(ring, (a,b) -> a.getKey().compareTo(b.getKey()));
-                            int sizeOfRing = ring.size();
-                            // El anillo estaba vacío, ahora está únicamente el nuevo | PRE y SUC son vacíos
-                            if (sizeOfRing == 1) {
-                                serverReply = new StandardObject(newNode, true);
-                            } else {
-                                int newIndex = ring.indexOf(newNode);
-                                Node updatedNode = new Node(newNode);
-                                updatedNode.setPredecessor(ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1));
-                                updatedNode.setSuccessor(ring.get((newIndex+1 == sizeOfRing) ? 0 : newIndex+1));
+                            Node newNode = (Node) clientRequest.getObject();                            
+                            switch(protocol[2]) {
+                                case "PREDECESSOR":
+                                    Data.getMyNode().setSuccessor(newNode);
+                                    break;
+                                case "SUCCESSOR":
+                                    Data.getMyNode().setPredecessor(newNode);
+                                    break;
                             }
-                            objectToClient.writeObject(serverReply);
                             break;
                         case "LEAVE":
                             //JChordGhostController.leaveRing();

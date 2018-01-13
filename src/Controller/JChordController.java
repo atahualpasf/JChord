@@ -29,20 +29,22 @@ public class JChordController {
     public static void joinRing(String myIp, Integer myPort) {
         try {
             if (Data.getMyNode() == null) {
-                connection = new Socket(Util.GHOST_IP, Util.GHOST_PORT);
-                outputObject = new ObjectOutputStream(connection.getOutputStream());
-                inputObject = new ObjectInputStream(connection.getInputStream());
+                openConnection(Util.GHOST_IP, Util.GHOST_PORT);
                 Node me = new Node(myIp, myPort);
                 me.setKey(Util.hashCode(me));
-                StandardObject standardObject = new StandardObject(me, true)
+                StandardObject request = new StandardObject(me, true)
                         .buildProtocol(Arrays.asList("1","JOIN"));
-                outputObject.writeObject(standardObject);
-                standardObject = (StandardObject) inputObject.readObject();
-                System.out.println(standardObject);
-                if (standardObject.isSuccess()) {
-                    Data.setMyNode((Node) standardObject.getObject());
+                outputObject.writeObject(request);
+                request = (StandardObject) inputObject.readObject();
+                System.out.println(request);
+                if (request.isSuccess()) {
+                    Data.setMyNode((Node) request.getObject());
                 }
                 connection.close();
+                Node predecessor = Data.getMyNode().getPredecessor();
+                Node successor = Data.getMyNode().getSuccessor();
+                if (predecessor != null) joinNode(predecessor, true);
+                if (successor != null) joinNode(successor, false);
             } else {
                 System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Su sesión ya está activa.");
             }
@@ -52,5 +54,31 @@ public class JChordController {
             Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    public static void joinNode(Node nodeToJoin, boolean isPredecessor) {
+        try {
+            openConnection(nodeToJoin.getIp(), nodeToJoin.getPort());
+            Node me = new Node(Data.getMyNode());
+            StandardObject request = (isPredecessor) ? 
+                    new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList("1","JOIN","PREDECESSOR")) : 
+                    new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList("1","JOIN","SUCCESSOR"));
+            outputObject.writeObject(request);
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static void openConnection(String ip, Integer port) {
+        try {
+            connection = new Socket(ip, port);
+            outputObject = new ObjectOutputStream(connection.getOutputStream());
+            inputObject = new ObjectInputStream(connection.getInputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

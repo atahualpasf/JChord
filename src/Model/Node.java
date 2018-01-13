@@ -16,14 +16,20 @@ import java.util.Objects;
  */
 public class Node implements Serializable {
     private Integer key;
-    private String myIp;
-    private Integer myPort;
+    private String ip;
+    private Integer port;
     private Node successor = null;
     private Node predecessor = null;
 
     public Node(String myIp, Integer myPort) {
-        this.myIp = myIp;
-        this.myPort = myPort;
+        this.ip = myIp;
+        this.port = myPort;
+    }
+    
+    public Node(Node node) {
+        this.ip = node.getIp();
+        this.port = node.getPort();
+        this.key = node.getKey();
     }
 
     public Integer getKey() {
@@ -34,20 +40,20 @@ public class Node implements Serializable {
         this.key = key;
     }
 
-    public String getMyIp() {
-        return myIp;
+    public String getIp() {
+        return ip;
     }
 
-    public void setMyIp(String myIp) {
-        this.myIp = myIp;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
-    public Integer getMyPort() {
-        return myPort;
+    public Integer getPort() {
+        return port;
     }
 
-    public void setMyPort(Integer myPort) {
-        this.myPort = myPort;
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     public Node getSuccessor() {
@@ -85,8 +91,11 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return "Node{" + "key=" + key + ", myIp=" + myIp + ", myPort=" + myPort + ", successor=" + successor + ", predecessor=" + predecessor + '}';
+        return "Node{" + "key=" + key + ", myIp=" + ip + ", myPort=" + port + ", successor=" + successor + ", predecessor=" + predecessor + '}';
     }
 
-    
+    public void cleanRelations() {
+        this.predecessor = null;
+        this.successor = null;
+    }
 }
