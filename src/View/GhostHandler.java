@@ -53,6 +53,7 @@ public class GhostHandler extends Thread {
                             break;
                         case "LEAVE":
                             GhostHandlerController.leaveRing(clientRequest, ring, objectToClient);
+                            GhostHandlerController.notifyRingNodes(ring);
                         default:
                             break;
                     }
