@@ -8,6 +8,7 @@ package View;
 import Controller.Data;
 import Controller.JChordController;
 import Controller.Util;
+import com.google.gson.Gson;
 
 /**
  *
@@ -34,7 +35,7 @@ public class JChord {
         nodeMenu.putAction("LEAVE RING", () -> {JChordController.leaveRing();});
         nodeMenu.putAction("LOAD FILES", () -> {JChordController.loadArchives();});
         nodeMenu.putAction("SHOW LOCAL FILES", () -> {JChordController.showLocalArchives();});
-        nodeMenu.putAction("SHOW INFO", () -> {System.out.println(Data.getMyNode());});
+        nodeMenu.putAction("SHOW INFO", () -> {Util.prettyFormat(Data.getMyNode());});
         while (wannaRun) {
             // TODO some error checking.
             System.out.println(nodeMenu.generateText());

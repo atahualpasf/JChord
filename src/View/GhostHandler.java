@@ -49,12 +49,10 @@ public class GhostHandler extends Thread {
                     switch(protocol[1]) {
                         case "JOIN":
                             GhostHandlerController.joinRing(clientRequest, ring, objectToClient);
+                            GhostHandlerController.notifyRingNodes(ring);
                             break;
                         case "LEAVE":
                             GhostHandlerController.leaveRing(clientRequest, ring, objectToClient);
-                        case "3":
-                            //JChordGhostController.saveArchives();
-                            break;
                         default:
                             break;
                     }

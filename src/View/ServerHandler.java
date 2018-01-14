@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.TreeMap;
 
 /**
  *
@@ -69,10 +70,12 @@ public class ServerHandler extends Thread {
                                     break;
                             }
                             break;
-                        case "3":
-                            //JChordGhostController.saveArchives();
+                        case "FIXFINGERS":
+                            TreeMap<Integer,Node> fingerTable = (TreeMap<Integer, Node>) clientRequest.getObject();
+                            Data.getMyNode().setFingerTable(fingerTable);
                             break;
                         default:
+                            System.out.println("Nei");
                             break;
                     }
                 }

@@ -7,6 +7,10 @@
 package Controller;
 
 import Model.Node;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -31,9 +35,9 @@ public class Util {
     
     // Constantes de aplicación
     public static Integer MAX_NODES = null;
-    private static final Integer M_BITS = 8;
+    public static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4444;
+    public static final Integer MY_PORT = 4448;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String DELIMETER = ":";
@@ -76,6 +80,13 @@ public class Util {
             MAX_NODES = (int) Math.pow(i, M_BITS);
         }
     }
+    
+    public static String prettyFormat(Node node) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(node);
+        System.out.println(json);
+      return json;
+  }
     
     public static String getMyIp() {
         if (MY_IP == null) {

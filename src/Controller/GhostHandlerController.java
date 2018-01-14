@@ -9,11 +9,12 @@ package Controller;
 import Model.Node;
 import Model.StandardObject;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +53,7 @@ public class GhostHandlerController {
             StandardObject serverReply;
             Node oldNode = (Node) clientRequest.getObject();
             ring.remove(oldNode);
+            Collections.sort(ring, (a,b) -> a.getKey().compareTo(b.getKey()));
             String command = null;
             if (ring.size() == 1) {
                 command = "ONLYONE";
@@ -63,5 +65,43 @@ public class GhostHandlerController {
         } catch (IOException ex) {
             Logger.getLogger(GhostHandlerController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static void notifyRingNodes(List<Node> ring) {
+        Socket nodeToNotify;
+        StandardObject ghostRequest;
+        try {
+            for ( Node node : ring ) {
+                TreeMap<Integer,Node> fingerTable = buildFingerTable(ring, node);
+                System.out.println(fingerTable);
+                ghostRequest = new StandardObject(fingerTable, true)
+                        .buildProtocol(Arrays.asList("3","FIXFINGERS"));
+                nodeToNotify = new Socket(node.getIp(), node.getPort());
+                ObjectOutputStream objectToClient = new ObjectOutputStream(nodeToNotify.getOutputStream());
+                objectToClient.writeObject(ghostRequest);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(GhostHandlerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static TreeMap<Integer,Node> buildFingerTable(List<Node> ring, Node nodeToAddFT) {
+        TreeMap<Integer,Node> fingerTable = new TreeMap<>();
+        int base = 2;
+        for ( int i = 1 ; i <= Util.M_BITS ; i++) {
+            int key = (nodeToAddFT.getKey() + (int) Math.pow(base, i-1)) % Util.MAX_NODES;
+            Node nodeToPoint = null;
+            for ( Node node : ring ) {
+                if (node.getKey() >= key) {
+                    nodeToPoint = new Node(node);
+                    break;
+                }
+            }            
+            if (nodeToPoint == null)
+                nodeToPoint = new Node(ring.get(0));
+            
+            fingerTable.put(key, nodeToPoint);
+        }        
+        return fingerTable;
     }
 }

@@ -33,7 +33,7 @@ public class Ghost {
     public static void main(String[] args) {
         try {
             // TODO code application logic here
-            
+            Util.calculateMaxNodes();
             List<Node> ring = new ArrayList<>();
             DemonGhost demonGhost = new DemonGhost(ring);
             demonGhost.start();

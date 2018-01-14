@@ -7,7 +7,9 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  *
@@ -20,6 +22,7 @@ public class Node implements Serializable {
     private Integer port;
     private Node successor = null;
     private Node predecessor = null;
+    private TreeMap<Integer,Node> FingerTable = new TreeMap<>();
 
     public Node(String myIp, Integer myPort) {
         this.ip = myIp;
@@ -87,6 +90,14 @@ public class Node implements Serializable {
         this.successor = null;
     }
 
+    public TreeMap<Integer, Node> getFingerTable() {
+        return FingerTable;
+    }
+
+    public void setFingerTable(TreeMap<Integer, Node> FingerTable) {
+        this.FingerTable = FingerTable;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -104,6 +115,6 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return "Node{" + "key=" + key + ", myIp=" + ip + ", myPort=" + port + ", successor=" + successor + ", predecessor=" + predecessor + '}';
+        return "Node{" + "key=" + key + ", ip=" + ip + ", port=" + port + ", successor=" + successor + ", predecessor=" + predecessor + ", FingerTable=" + FingerTable + '}';
     }
 }
