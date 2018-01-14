@@ -49,7 +49,7 @@ public class StandardObject implements Serializable {
             if (protocol == null)
                 protocol = data;
             else
-                protocol = protocol + Util.DELIMETER + data;
+                protocol = protocol + Util.CMD_DELIMETER + data;
         });
         return this;
     }

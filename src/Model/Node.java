@@ -7,7 +7,6 @@
 package Model;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -24,6 +23,10 @@ public class Node implements Serializable {
     private Node predecessor = null;
     private TreeMap<Integer,Node> FingerTable = new TreeMap<>();
 
+    public Node(Integer key) {
+        this.key = key;
+    }
+    
     public Node(String myIp, Integer myPort) {
         this.ip = myIp;
         this.port = myPort;

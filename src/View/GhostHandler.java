@@ -44,7 +44,7 @@ public class GhostHandler extends Thread {
             while (true) {
                 clientRequest = (StandardObject) objectFromClient.readObject();
                 System.out.println(clientRequest);
-                String protocol[] = clientRequest.getProtocol().split(Util.DELIMETER);
+                String protocol[] = clientRequest.getProtocol().split(Util.CMD_DELIMETER);
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":

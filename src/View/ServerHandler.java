@@ -8,13 +8,17 @@ package View;
 
 import Controller.Data;
 import Controller.Util;
+import Model.Archive;
 import Model.Node;
 import Model.StandardObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -41,7 +45,7 @@ public class ServerHandler extends Thread {
             while (true) {
                 clientRequest = (StandardObject) objectFromClient.readObject();
                 System.out.println(clientRequest);
-                String protocol[] = clientRequest.getProtocol().split(Util.DELIMETER);
+                String protocol[] = clientRequest.getProtocol().split(Util.CMD_DELIMETER);
                 if (protocol[1] != null) {
                     switch(protocol[1]) {
                         case "JOIN":
@@ -71,8 +75,31 @@ public class ServerHandler extends Thread {
                             }
                             break;
                         case "FIXFINGERS":
-                            TreeMap<Integer,Node> fingerTable = (TreeMap<Integer, Node>) clientRequest.getObject();
+                            TreeMap<Integer,Node> fingerTable = (TreeMap<Integer,Node>) clientRequest.getObject();
                             Data.getMyNode().setFingerTable(fingerTable);
+                            break;
+                        case "LOOKUP":
+                            Node nodeToReply = (Node) clientRequest.getObject();
+                            Archive archiveToLookup = (Archive) ((StandardObject) objectFromClient.readObject()).getObject();
+                            if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
+                                System.out.println("Es menor");
+                                try {
+                                    Node nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(archiveToLookup.getKey()).getValue();
+                                    Socket connection = new Socket(nodeToAsk.getIp(), nodeToAsk.getPort());
+                                    ObjectOutputStream outputObject = new ObjectOutputStream(connection.getOutputStream());
+                                    ObjectInputStream inputObject = new ObjectInputStream(connection.getInputStream());
+                                    StandardObject request = new StandardObject(nodeToReply, true)
+                                            .buildProtocol(Arrays.asList("4","LOOKUP"));
+                                    outputObject.writeObject(request);
+                                    request = new StandardObject(archiveToLookup, true);
+                                    outputObject.writeObject(request);
+                                    connection.close();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(ServerHandler.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            } else {
+                                System.out.println("Soy el que tal");
+                            }
                             break;
                         default:
                             System.out.println("Nei");

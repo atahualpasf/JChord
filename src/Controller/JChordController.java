@@ -9,12 +9,15 @@ package Controller;
 import Model.Node;
 import Model.StandardObject;
 import Model.Archive;
+import View.KeyIn;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -110,6 +113,32 @@ public class JChordController {
             });
         } else {
             System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
+        }
+    }
+    
+    public static void lookupArchive() {
+        if (Data.getMyNode() != null && Data.getMyNode().getPredecessor() != null && Data.getMyNode().getSuccessor() != null) {
+            try {
+                String filename = KeyIn.inString("|\t\t   NOMBRE DE ARCHIVO ->");
+                Integer keyFile = Util.hashCode(filename);
+                Archive archiveToLookup = new Archive(keyFile, filename);
+                Node me = new Node(Data.getMyNode());
+                Node nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
+                openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
+                StandardObject request = new StandardObject(me, true)
+                        .buildProtocol(Arrays.asList("4","LOOKUP"));
+                outputObject.writeObject(request);
+                request = new StandardObject(archiveToLookup, true);
+                outputObject.writeObject(request);
+                connection.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            if (Data.getMyNode() == null)
+                System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
+            else
+                System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Solo se encuentra usted en el anillo, intente luego.");
         }
     }
     

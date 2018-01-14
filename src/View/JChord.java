@@ -35,6 +35,7 @@ public class JChord {
         nodeMenu.putAction("LEAVE RING", () -> {JChordController.leaveRing();});
         nodeMenu.putAction("LOAD FILES", () -> {JChordController.loadArchives();});
         nodeMenu.putAction("SHOW LOCAL FILES", () -> {JChordController.showLocalArchives();});
+        nodeMenu.putAction("SEARCH FILE", () -> {JChordController.lookupArchive();});
         nodeMenu.putAction("SHOW INFO", () -> {Util.prettyFormat(Data.getMyNode());});
         while (wannaRun) {
             // TODO some error checking.

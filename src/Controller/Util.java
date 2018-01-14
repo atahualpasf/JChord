@@ -35,10 +35,11 @@ public class Util {
     public static Integer MAX_NODES = null;
     public static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4446;
+    public static final Integer MY_PORT = 4447;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
-    public static final String DELIMETER = ":";
+    public static final String CMD_DELIMETER = ":";
+    public static final String SUBCMD_DELIMETER = ";";
     // Constantes para mostrar colores en la consola
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
