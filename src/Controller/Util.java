@@ -34,10 +34,11 @@ public class Util {
     // Constantes de aplicación
     public static Integer THREAD_TIMEOUT = 200;
     public static Integer SOCKET_TIMEOUT = 10000;
+    public static Integer SOCKET_TIMEOUT_DOWNLOAD = 900000;
     public static Integer MAX_NODES = null;
     public static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4446;
+    public static final Integer MY_PORT = 4450;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String CMD_DELIMETER = ":";
@@ -82,9 +83,9 @@ public class Util {
         }
     }
     
-    public static String prettyFormat(Node node) {
+    public static String prettyFormat(Object obj) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(node);
+        String json = gson.toJson(obj);
         System.out.println(json);
       return json;
   }

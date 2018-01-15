@@ -40,8 +40,8 @@ public class GhostHandlerController {
             } else {
                 int newIndex = ring.indexOf(newNode);
                 Node updatedNode = new Node(newNode);
-                updatedNode.setPredecessor(ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1));
-                updatedNode.setSuccessor(ring.get((newIndex+1 == sizeOfRing) ? 0 : newIndex+1));
+                updatedNode.setPredecessor(new Node(ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1), true));
+                updatedNode.setSuccessor(new Node(ring.get((newIndex+1 == sizeOfRing) ? 0 : newIndex+1), true));
                 serverReply = new StandardObject(updatedNode, true);
             }
             objectToClient.writeObject(serverReply);
@@ -75,7 +75,6 @@ public class GhostHandlerController {
             for ( Node node : ring ) {
                 
                 TreeMap<Integer,Node> fingerTable = buildFingerTable(ring, node);
-                //System.out.println(fingerTable);
                 ghostRequest = new StandardObject(fingerTable, true)
                         .buildProtocol(Arrays.asList("3","FIXFINGERS"));
                 Socket nodeToNotify = new Socket(node.getIp(), node.getPort());
@@ -86,7 +85,6 @@ public class GhostHandlerController {
                 TreeMap<Archive,List<Node>> filesTable = buildFilesTable(ring, node);
                 ghostRequest = new StandardObject(filesTable, true);
                 objectToClient.writeObject(ghostRequest);
-                //nodeToNotify.close();
             }
         } catch (IOException ex) {
             Logger.getLogger(GhostHandlerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -101,12 +99,12 @@ public class GhostHandlerController {
             Node nodeToPoint = null;
             for ( Node node : ring ) {
                 if (node.getKey() >= key) {
-                    nodeToPoint = new Node(node);
+                    nodeToPoint = new Node(node, true);
                     break;
                 }
             }            
             if (nodeToPoint == null)
-                nodeToPoint = new Node(ring.get(0));
+                nodeToPoint = new Node(ring.get(0), true);
             
             fingerTable.put(key, nodeToPoint);
         }        

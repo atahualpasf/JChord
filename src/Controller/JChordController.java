@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -118,21 +119,49 @@ public class JChordController {
     
     public static void lookupArchive() {
         if (Data.getMyNode() != null && Data.getMyNode().getPredecessor() != null && Data.getMyNode().getSuccessor() != null) {
-            try {
-                String filename = KeyIn.inString("|\t\t   NOMBRE DE ARCHIVO ->");
-                Integer keyFile = Util.hashCode(filename);
-                Archive archiveToLookup = new Archive(keyFile, filename);
-                Node me = new Node(Data.getMyNode());
-                Node nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
-                openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
-                StandardObject request = new StandardObject(me, true)
-                        .buildProtocol(Arrays.asList("4","LOOKUP"));
-                outputObject.writeObject(request);
-                request = new StandardObject(archiveToLookup, true);
-                outputObject.writeObject(request);
-                connection.close();
-            } catch (IOException ex) {
-                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            String filename = KeyIn.inString("|\t\t   NOMBRE DE ARCHIVO ->");
+            Integer keyFile = Util.hashCode(filename);
+            Archive archiveToLookup = new Archive(keyFile, filename);
+            Node me = new Node(Data.getMyNode(), true);
+            System.out.println(keyFile);
+            if (!Data.getMyNode().getLocalFiles().contains(archiveToLookup)) {
+                if (!Data.getMyNode().getRemoteFilesTable().containsKey(archiveToLookup)) {
+                    System.out.println("YO NO SE QUIEN LO TIENE, PERO SE QUIEN PUEDE INFORMAR");
+                    Node nodeToAsk;
+                    try {
+                        nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
+                    } catch(NullPointerException e) {
+                        nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
+                    }
+                    System.out.println("NODETOASK " + nodeToAsk);
+                    /*openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
+                    StandardObject request = new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList("4","LOOKUP"));
+                    outputObject.writeObject(request);
+                    request = new StandardObject(archiveToLookup, true);
+                    outputObject.writeObject(request);
+                    connection.close();*/
+                } else {
+                    try {
+                        System.out.println("YO INFORMO");
+                        List<Node> listNode = Data.getMyNode().getRemoteFilesTable().get(archiveToLookup);
+                        Random randomIndex = new Random();
+                        Node nodeSelected = listNode.get(randomIndex.nextInt(listNode.size()));
+                        StandardObject request = new StandardObject(me,true)
+                                .buildProtocol(Arrays.asList("6","SENDFILE"));
+                        Socket connection = new Socket(nodeSelected.getIp(), nodeSelected.getPort());
+                        connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
+                        ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                        objectToSend.writeObject(request);                        
+                        request = new StandardObject(archiveToLookup,true);
+                        objectToSend.writeObject(request);
+                    } catch (IOException ex) {
+                        Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else {
+                System.out.print(Util.ANSI_BLUE + "INFORMACIÓN: " + Util.ANSI_RESET);
+                System.out.println("Disculpe pero ya posee el archivo " + Util.ANSI_BLUE + archiveToLookup.getName());
             }
         } else {
             if (Data.getMyNode() == null)

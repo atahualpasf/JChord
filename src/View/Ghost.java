@@ -76,6 +76,7 @@ class DemonGhost extends Thread {
             while (true)
             {
                 ghostClient = ghostServer.accept();
+                ghostClient.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
                 System.out.println(Util.ANSI_BLUE + "INFORMACIÓN:" + Util.ANSI_RESET + " Cliente -> " + ghostClient.getInetAddress().getHostAddress() + ":" + ghostClient.getPort());
                 new GhostHandler(ghostClient, ring).start();
             }
