@@ -10,24 +10,23 @@ import Controller.Data;
 import Controller.Util;
 import Model.Archive;
 import Model.Node;
-import Model.StandardObject;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Atahualpa Silva F. <https://github.com/atahualpasf>
- * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
+ * Clase que se encarga del envio del archivo.
+ * 
+ * @author Atahualpa Silva F.
+ * @link https://github.com/atahualpasf
+ * <br> 
+ * @author Andrea L. Contreras D.
+ * @link https://github.com/andrecontdi
  */
 public class SendFile extends Thread {
     
@@ -41,6 +40,15 @@ public class SendFile extends Thread {
     //private ArrayList<DatosCliente> ListaClientes;
     private long byteInicio;
     
+    /**
+     * Constructor de la clase.
+     * 
+     * @param nodeSocket
+     * @param dataOutputStream
+     * @param dataInputStream
+     * @param node
+     * @param archive 
+     */
     public SendFile(Socket nodeSocket, ObjectOutputStream dataOutputStream, ObjectInputStream dataInputStream, Node node, Archive archive) {
         this.socket = nodeSocket;
         this.node = node;
@@ -52,6 +60,10 @@ public class SendFile extends Thread {
         this.byteInicio = 0;
     }
     
+    /**
+     * Método que se encarga de cerrar todas las validaciones.
+     * 
+     */
     public void Close() {
         try {
             if (socket != null) {socket.close();};

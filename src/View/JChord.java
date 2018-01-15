@@ -11,15 +11,20 @@ import Controller.Util;
 import java.io.File;
 
 /**
- *
- * @author Atahualpa Silva F. <https://github.com/atahualpasf>
- * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
+ * Clase que se encarga de iniciar el servidor JChord y también de mandar 
+ * a crear el menú y recibir la selección del usuario.
+ * 
+ * @author Atahualpa Silva F.
+ * @link https://github.com/atahualpasf
+ * <br> 
+ * @author Andrea L. Contreras D.
+ * @link https://github.com/andrecontdi
  */
 public class JChord {
     private static Menu nodeMenu;
     
     /**
-     * @param args the command line arguments
+     * @param args The command line arguments
      */
     public static void main(String[] args) throws ClassNotFoundException, InterruptedException {
         // TODO code application logic here
@@ -34,10 +39,10 @@ public class JChord {
         int option;
         nodeMenu = new Menu("MAIN ");
         nodeMenu.putAction("JOIN RING", () -> {JChordController.joinRing();});
-        nodeMenu.putAction("LEAVE RING", () -> {JChordController.leaveRing();});
         nodeMenu.putAction("SHOW LOCAL FILES", () -> {JChordController.showLocalArchives();});
         nodeMenu.putAction("SEARCH FILE", () -> {JChordController.lookupArchive();});
         nodeMenu.putAction("SHOW INFO", () -> {Util.prettyFormat(Data.getMyNode());});
+        nodeMenu.putAction("LEAVE RING", () -> {JChordController.leaveRing();});
         while (wannaRun) {
             // TODO some error checking.
             System.out.println(nodeMenu.generateText());
