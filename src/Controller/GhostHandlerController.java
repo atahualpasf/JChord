@@ -6,11 +6,13 @@
 
 package Controller;
 
+import Model.Archive;
 import Model.Node;
 import Model.StandardObject;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -68,17 +70,23 @@ public class GhostHandlerController {
     }
     
     public static void notifyRingNodes(List<Node> ring) {
-        Socket nodeToNotify;
         StandardObject ghostRequest;
         try {
             for ( Node node : ring ) {
+                
                 TreeMap<Integer,Node> fingerTable = buildFingerTable(ring, node);
-                System.out.println(fingerTable);
+                //System.out.println(fingerTable);
                 ghostRequest = new StandardObject(fingerTable, true)
                         .buildProtocol(Arrays.asList("3","FIXFINGERS"));
-                nodeToNotify = new Socket(node.getIp(), node.getPort());
+                Socket nodeToNotify = new Socket(node.getIp(), node.getPort());
+                nodeToNotify.setSoTimeout(Util.SOCKET_TIMEOUT);
                 ObjectOutputStream objectToClient = new ObjectOutputStream(nodeToNotify.getOutputStream());
                 objectToClient.writeObject(ghostRequest);
+                
+                TreeMap<Archive,List<Node>> filesTable = buildFilesTable(ring, node);
+                ghostRequest = new StandardObject(filesTable, true);
+                objectToClient.writeObject(ghostRequest);
+                //nodeToNotify.close();
             }
         } catch (IOException ex) {
             Logger.getLogger(GhostHandlerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -103,5 +111,43 @@ public class GhostHandlerController {
             fingerTable.put(key, nodeToPoint);
         }        
         return fingerTable;
+    }
+    
+    private static TreeMap<Archive,List<Node>> buildFilesTable(List<Node> ring, Node nodeToAddFT) {
+        TreeMap<Archive,List<Node>> filesTable = new TreeMap<>();
+        int sizeOfRing = ring.size();
+        if (sizeOfRing > 1) {
+            int newIndex = ring.indexOf(nodeToAddFT);
+            int keyNode = nodeToAddFT.getKey();
+            int keyPredecessor = ring.get((newIndex == 0) ? sizeOfRing-1 : newIndex-1).getKey();
+            ring.forEach((node) -> {
+                node.getLocalFiles().forEach((archive) -> {
+                    int keyArchive = archive.getKey();
+                    if (keyPredecessor > keyNode) {
+                        if (keyArchive > keyPredecessor || keyArchive <= keyNode) {
+                            addToFilesTable(filesTable, archive, node);
+                        }
+                    } else {                        
+                        if (keyArchive > keyPredecessor && keyArchive <= keyNode) {
+                            addToFilesTable(filesTable, archive, node);
+                        }
+                    }
+                });
+            });
+            return filesTable;
+        }
+        return null;
+    }
+    
+    private static void addToFilesTable(TreeMap<Archive,List<Node>> filesTable, Archive archive, Node node) {
+        if (!filesTable.containsKey(archive)) {
+            Node tempNode = new Node(node, true);
+            List<Node> listNode = new ArrayList<>();
+            listNode.add(tempNode);
+            filesTable.put(archive, listNode);
+        } else {
+            Node tempNode = new Node(node, true);
+            filesTable.get(archive).add(tempNode);
+        } 
     }
 }

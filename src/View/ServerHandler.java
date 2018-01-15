@@ -16,6 +16,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,7 +77,9 @@ public class ServerHandler extends Thread {
                             break;
                         case "FIXFINGERS":
                             TreeMap<Integer,Node> fingerTable = (TreeMap<Integer,Node>) clientRequest.getObject();
+                            TreeMap<Archive,List<Node>> filesTable = (TreeMap<Archive,List<Node>>) ((StandardObject) objectFromClient.readObject()).getObject();
                             Data.getMyNode().setFingerTable(fingerTable);
+                            Data.getMyNode().setRemoteFilesTable(filesTable);
                             break;
                         case "LOOKUP":
                             Node nodeToReply = (Node) clientRequest.getObject();

@@ -24,18 +24,20 @@ import java.util.Objects;
 public class Util {
     // Constantes de os
     private static String OS = null;
-    private static final String LW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\LOCAL";
-    private static final String DW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\DOWNLOAD";
-    private static final String LL_FILES_PATH = "/home/atahualpasf/Documents/SD/LOCAL";
-    private static final String DL_FILES_PATH = "/home/atahualpasf/Documents/SD/DOWNLOAD";
+    private static final String LW_FILES_PATH = "SD\\LOCAL";
+    private static final String DW_FILES_PATH = "SD\\DOWNLOAD";    
+    private static final String LL_FILES_PATH = "SD/LOCAL";
+    private static final String DL_FILES_PATH = "SD/DOWNLOAD";
     private static final String W_DIR_SEPARATOR = "\\";
     private static final String L_DIR_SEPARATOR = "/";
     
     // Constantes de aplicación
+    public static Integer THREAD_TIMEOUT = 200;
+    public static Integer SOCKET_TIMEOUT = 10000;
     public static Integer MAX_NODES = null;
     public static final Integer M_BITS = 8;
     private static String MY_IP = null;
-    public static final Integer MY_PORT = 4447;
+    public static final Integer MY_PORT = 4446;
     public static final String GHOST_IP = "192.168.0.110";
     public static final Integer GHOST_PORT = 5555;
     public static final String CMD_DELIMETER = ":";

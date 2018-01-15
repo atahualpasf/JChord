@@ -8,7 +8,7 @@ package View;
 import Controller.Data;
 import Controller.JChordController;
 import Controller.Util;
-import com.google.gson.Gson;
+import java.io.File;
 
 /**
  *
@@ -26,6 +26,8 @@ public class JChord {
         Util.calculateMaxNodes();
         Server jChordServer = new Server();
         jChordServer.start();
+        new File(Util.getLocalDirPath()).mkdirs();
+        new File(Util.getDownloadDirPath()).mkdirs();
         Thread.sleep(300);
         
         boolean wannaRun = true;
@@ -33,7 +35,6 @@ public class JChord {
         nodeMenu = new Menu("MAIN ");
         nodeMenu.putAction("JOIN RING", () -> {JChordController.joinRing();});
         nodeMenu.putAction("LEAVE RING", () -> {JChordController.leaveRing();});
-        nodeMenu.putAction("LOAD FILES", () -> {JChordController.loadArchives();});
         nodeMenu.putAction("SHOW LOCAL FILES", () -> {JChordController.showLocalArchives();});
         nodeMenu.putAction("SEARCH FILE", () -> {JChordController.lookupArchive();});
         nodeMenu.putAction("SHOW INFO", () -> {Util.prettyFormat(Data.getMyNode());});

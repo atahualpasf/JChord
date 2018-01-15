@@ -7,6 +7,8 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -21,7 +23,9 @@ public class Node implements Serializable {
     private Integer port;
     private Node successor = null;
     private Node predecessor = null;
-    private TreeMap<Integer,Node> FingerTable = new TreeMap<>();
+    private TreeMap<Integer,Node> fingerTable = new TreeMap<>();
+    private TreeMap<Archive,List<Node>> remoteFilesTable = new TreeMap<>();
+    private List<Archive> localFiles = new ArrayList<>();
 
     public Node(Integer key) {
         this.key = key;
@@ -33,6 +37,13 @@ public class Node implements Serializable {
     }
     
     public Node(Node node) {
+        this.ip = node.getIp();
+        this.port = node.getPort();
+        this.key = node.getKey();
+        this.localFiles = node.getLocalFiles();
+    }
+    
+    public Node(Node node, boolean notFiles) {
         this.ip = node.getIp();
         this.port = node.getPort();
         this.key = node.getKey();
@@ -94,11 +105,27 @@ public class Node implements Serializable {
     }
 
     public TreeMap<Integer, Node> getFingerTable() {
-        return FingerTable;
+        return fingerTable;
     }
 
     public void setFingerTable(TreeMap<Integer, Node> FingerTable) {
-        this.FingerTable = FingerTable;
+        this.fingerTable = FingerTable;
+    }
+
+    public TreeMap<Archive, List<Node>> getRemoteFilesTable() {
+        return remoteFilesTable;
+    }
+
+    public void setRemoteFilesTable(TreeMap<Archive, List<Node>> remoteFilesTable) {
+        this.remoteFilesTable = remoteFilesTable;
+    }
+
+    public List<Archive> getLocalFiles() {
+        return localFiles;
+    }
+
+    public void setLocalFiles(List<Archive> localFiles) {
+        this.localFiles = localFiles;
     }
 
     @Override
@@ -118,6 +145,6 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return "Node{" + "key=" + key + ", ip=" + ip + ", port=" + port + ", successor=" + successor + ", predecessor=" + predecessor + ", FingerTable=" + FingerTable + '}';
+        return "Node{" + "key=" + key + ", ip=" + ip + ", port=" + port + ", successor=" + successor + ", predecessor=" + predecessor + ", fingerTable=" + fingerTable + ", remoteFilesTable=" + remoteFilesTable + ", localFiles=" + localFiles + '}';
     }
 }
