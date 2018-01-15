@@ -15,13 +15,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
- * @author Atahualpa Silva F. <https://github.com/atahualpasf>
- * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
+ * Clase que se encarga de manejar las operaciones que puede realizar el nodo
+ * fantasma.
+ * 
+ * @author Atahualpa Silva F.
+ * @link https://github.com/atahualpasf
+ * <br> 
+ * @author Andrea L. Contreras D.
+ * @link https://github.com/andrecontdi
  */
 public class GhostHandler extends Thread {
     private final Socket ghostClient;
@@ -31,6 +34,13 @@ public class GhostHandler extends Thread {
     private ObjectOutputStream objectToClient = null;
     private List<Node> ring = null;
 
+    /**
+     * Constructor de la clase.
+     * 
+     * @param ghostClient Socket que identifica al cliente que se quiere
+     * conectar.
+     * @param ring Anillo al que se quiere conectar.
+     */
     public GhostHandler(Socket ghostClient, List<Node> ring) {
         this.ghostClient = ghostClient;
         this.ring = ring;
@@ -64,13 +74,11 @@ public class GhostHandler extends Thread {
             }
         }
         catch (ClassNotFoundException e) {
-            System.out.print(Util.ANSI_RED + "EXCEPTION: ClassNotFoundException ");
-            System.out.println(Util.ANSI_RESET + e.getMessage());
+            Util.showMessage(3, 3, GhostHandler.class.getSimpleName(), "ClassNotFoundException " + e.getMessage()); 
         } catch(IOException e) {
-            System.out.print(Util.ANSI_RED + "EXCEPTION: IOException ");
-            System.out.println(Util.ANSI_RESET + e.getMessage());
+            Util.showMessage(3, 3, GhostHandler.class.getSimpleName(), "IOException " + e.getMessage());
         } catch (InterruptedException ex) {
-            Logger.getLogger(GhostHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Util.showMessage(3, 3, GhostHandler.class.getSimpleName(), "InterruptedException " + ex.getMessage());
         }
     }
 }

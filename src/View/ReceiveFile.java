@@ -15,9 +15,13 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 /**
- *
- * @author Atahualpa Silva F. <https://github.com/atahualpasf>
- * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
+ * Clase que se encarga de recibir un archivo.
+ * 
+ * @author Atahualpa Silva F.
+ * @link https://github.com/atahualpasf
+ * <br> 
+ * @author Andrea L. Contreras D.
+ * @link https://github.com/andrecontdi
  */
 public class ReceiveFile extends Thread {
     
@@ -29,6 +33,13 @@ public class ReceiveFile extends Thread {
     private FileOutputStream out = null;
     private ObjectInputStream dis=null;
     
+    /**
+     * Constructor de la clase.
+     * 
+     * @param socket 
+     * @param dis 
+     * @param archive
+     */
     public ReceiveFile(Socket socket, ObjectInputStream dis, Archive archive) {
         this.socket = socket;
         this.archive = archive;
@@ -38,7 +49,8 @@ public class ReceiveFile extends Thread {
     
     /**
      * Devuelve si la descarga termino
-     * @return true si la descarga termino
+     * 
+     * @return true Si la descarga termino
      */
     public boolean descargaTerminada(){ 
         return tamañoArchivo==descargadoDelArchivo; 
@@ -46,16 +58,27 @@ public class ReceiveFile extends Thread {
     
     /**
      * Devuelve la cantidad de bytes descargados hasta ahora
-     * @return cantidad de bytes descargados
+     * 
+     * @return Cantidad de bytes descargados
      */
     public long descargadoDelArchivo() {
         return descargadoDelArchivo;
     }
     
+    /**
+     * Método que se encarga de obtener el byte de inicio.
+     * 
+     * @return Byte de Inicio.
+     */
     public long getByteInicio() {
         return byteInicio;
     }
     
+    /**
+     * Método que se encarga de cerrar todas las conexiones.
+     * 
+     * @throws IOException 
+     */
     public void Stop()throws IOException{
         if (socket != null) {socket.close();};
         if (out != null) {out.close();};
@@ -80,9 +103,8 @@ public class ReceiveFile extends Thread {
                     out = new FileOutputStream(Util.getDownloadDirPath() + Util.getOsDirSeparator() + 
                             archive.getName(), true); 
                 }
-
             } catch (FileNotFoundException ex) {
-                System.out.println("No se encontró el archivo.");
+                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "No se encontró el archivo. " + ex.getMessage()); 
             }
             tamañoArchivo = dis.readLong();
             descargadoDelArchivo = this.byteInicio;
@@ -99,16 +121,17 @@ public class ReceiveFile extends Thread {
             }
             System.out.println(this.archive.getName()+" "+(descargadoDelArchivo*100/tamañoArchivo)+"%");
         } catch (IOException e) {
-            System.out.println("Upps se callo la descarga. ");
+            Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "Upps se callo la descarga. "); 
         }finally{
             try{
-            if (socket != null) {socket.close();};
-            if (out != null) {out.close();};
-            if (dis!=null)  {dis.close(); ;}
-            this.stop();
-            }catch (IOException e){}
+                if (socket != null) {socket.close();};
+                if (out != null) {out.close();};
+                if (dis!=null)  {dis.close(); ;}
+                this.stop();
+            } catch (IOException e) {
+                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), e.getMessage()); 
+            }
         }
-
-        System.out.println(" Descarga terminada: "+this.archive.getName());        
+        Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), "Descarga terminada: " + this.archive.getName()); 
     }
 }
