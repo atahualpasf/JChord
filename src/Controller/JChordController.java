@@ -126,24 +126,29 @@ public class JChordController {
             System.out.println(keyFile);
             if (!Data.getMyNode().getLocalFiles().contains(archiveToLookup)) {
                 if (!Data.getMyNode().getRemoteFilesTable().containsKey(archiveToLookup)) {
-                    System.out.println("YO NO SE QUIEN LO TIENE, PERO SE QUIEN PUEDE INFORMAR");
-                    Node nodeToAsk;
                     try {
-                        nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
-                    } catch(NullPointerException e) {
-                        nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
+                        System.out.println("YO NO SE QUIEN LO TIENE, PERO TE INFORMO QUIEN PODRIA SABER");
+                        Node nodeToAsk;
+                        try {
+                            nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
+                        } catch(NullPointerException e) {
+                            nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
+                        }
+                        System.out.println("NODETOASK " + nodeToAsk);
+                        StandardObject request = new StandardObject(me, true)
+                                .buildProtocol(Arrays.asList("4","LOOKUP"));
+                        Socket connection = new Socket(nodeToAsk.getIp(), nodeToAsk.getPort());
+                        connection.setSoTimeout(Util.SOCKET_TIMEOUT);
+                        ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                        objectToSend.writeObject(request);
+                        request = new StandardObject(archiveToLookup, true);
+                        objectToSend.writeObject(request);
+                    } catch(IOException ex) {
+                        Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    System.out.println("NODETOASK " + nodeToAsk);
-                    /*openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
-                    StandardObject request = new StandardObject(me, true)
-                    .buildProtocol(Arrays.asList("4","LOOKUP"));
-                    outputObject.writeObject(request);
-                    request = new StandardObject(archiveToLookup, true);
-                    outputObject.writeObject(request);
-                    connection.close();*/
                 } else {
                     try {
-                        System.out.println("YO INFORMO");
+                        System.out.println("YO LE DIGO A QUIEN LO TIENE QUE LO ENVÍE");
                         List<Node> listNode = Data.getMyNode().getRemoteFilesTable().get(archiveToLookup);
                         Random randomIndex = new Random();
                         Node nodeSelected = listNode.get(randomIndex.nextInt(listNode.size()));

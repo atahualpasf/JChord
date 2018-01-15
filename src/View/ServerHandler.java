@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,7 +85,68 @@ public class ServerHandler extends Thread {
                         case "LOOKUP":
                             Node nodeToReply = (Node) clientRequest.getObject();
                             Archive archiveToLookup = (Archive) ((StandardObject) objectFromClient.readObject()).getObject();
-                            if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
+                            if (!Data.getMyNode().getLocalFiles().contains(archiveToLookup)) {
+                                if (!Data.getMyNode().getRemoteFilesTable().containsKey(archiveToLookup)) {
+                                    if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
+                                        if (Data.getMyNode().getPredecessor().getKey() < archiveToLookup.getKey()) {
+                                            StandardObject request = new StandardObject(archiveToLookup,true)
+                                            .buildProtocol(Arrays.asList("5","FILENOTFOUND"));
+                                            Socket connection = new Socket(nodeToReply.getIp(), nodeToReply.getPort());
+                                            connection.setSoTimeout(Util.SOCKET_TIMEOUT);
+                                            ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                                            objectToSend.writeObject(request);
+                                        } else {
+                                            Node nodeToAsk;
+                                            try {
+                                                nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(archiveToLookup.getKey()).getValue();
+                                            } catch(NullPointerException e) {
+                                                nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
+                                            }
+                                            System.out.println("NODETOASK " + nodeToAsk);
+                                            StandardObject request = new StandardObject(nodeToReply, true)
+                                                    .buildProtocol(Arrays.asList("4","LOOKUP"));
+                                            Socket connection = new Socket(nodeToAsk.getIp(), nodeToAsk.getPort());
+                                            connection.setSoTimeout(Util.SOCKET_TIMEOUT);
+                                            ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                                            objectToSend.writeObject(request);
+                                            request = new StandardObject(archiveToLookup, true);
+                                            objectToSend.writeObject(request);
+                                        }
+                                    } else {
+                                        StandardObject request = new StandardObject(archiveToLookup,true)
+                                            .buildProtocol(Arrays.asList("5","FILENOTFOUND"));
+                                        Socket connection = new Socket(nodeToReply.getIp(), nodeToReply.getPort());
+                                        connection.setSoTimeout(Util.SOCKET_TIMEOUT);
+                                        ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                                        objectToSend.writeObject(request);
+                                    }
+                                } else {
+                                    System.out.println("YO LE DIGO A QUIEN LO TIENE QUE LO ENVÍE");
+                                    List<Node> listNode = Data.getMyNode().getRemoteFilesTable().get(archiveToLookup);
+                                    Random randomIndex = new Random();
+                                    Node nodeSelected = listNode.get(randomIndex.nextInt(listNode.size()));
+                                    StandardObject request = new StandardObject(nodeToReply,true)
+                                            .buildProtocol(Arrays.asList("6","SENDFILE"));
+                                    Socket connection = new Socket(nodeSelected.getIp(), nodeSelected.getPort());
+                                    connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
+                                    ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                                    objectToSend.writeObject(request);                        
+                                    request = new StandardObject(archiveToLookup,true);
+                                    objectToSend.writeObject(request);
+                                }
+                            } else {
+                                System.out.println("YO SOY QUIEN LA TIENE");
+                                Node me = new Node(Data.getMyNode(), true);
+                                StandardObject request = new StandardObject(nodeToReply,true)
+                                        .buildProtocol(Arrays.asList("6","SENDFILE"));
+                                Socket connection = new Socket(me.getIp(), me.getPort());
+                                connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
+                                ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                                objectToSend.writeObject(request);                        
+                                request = new StandardObject(archiveToLookup,true);
+                                objectToSend.writeObject(request);
+                            }
+                            /*if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
                                 System.out.println("Es menor");
                                 try {
                                     Node nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(archiveToLookup.getKey()).getValue();
@@ -115,7 +177,7 @@ public class ServerHandler extends Thread {
                                     outputObject.writeObject(request);
                                     connection.shutdownOutput();
                                 }
-                            }
+                            }*/
                             break;
                         case "FILENOTFOUND":
                             Archive archive = (Archive) clientRequest.getObject();
@@ -144,7 +206,7 @@ public class ServerHandler extends Thread {
                             receiverFile.start();
                             break;
                         default:
-                            System.out.println("Nei");
+                            System.out.println("Comando no válido");
                             break;
                     }
                 }

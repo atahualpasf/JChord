@@ -30,7 +30,7 @@ public class Util {
     // Constantes de os
     private static String OS = null;
     private static final String LW_FILES_PATH = "SD\\LOCAL";
-    private static final String DW_FILES_PATH = "SD\\DOWNLOAD";    
+    private static final String DW_FILES_PATH = "SD\\DOWNLOAD";
     private static final String LL_FILES_PATH = "SD/LOCAL";
     private static final String DL_FILES_PATH = "SD/DOWNLOAD";
     private static final String W_DIR_SEPARATOR = "\\";
@@ -41,7 +41,7 @@ public class Util {
     public static final Integer M_BITS          = 8;
     private static String MY_IP                 = null;
     public static final Integer MY_PORT         = 4444;
-    public static final String GHOST_IP         = "192.168.0.107";
+    public static final String GHOST_IP         = "192.168.0.110";
     public static final Integer GHOST_PORT      = 5555;
     public static final String CMD_DELIMETER    = ":";
     public static Integer THREAD_TIMEOUT = 200;
