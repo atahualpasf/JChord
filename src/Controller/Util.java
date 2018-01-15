@@ -29,10 +29,10 @@ public class Util {
 
     // Constantes de os
     private static String OS = null;
-    private static final String LW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\LOCAL";
-    private static final String DW_FILES_PATH = "C:\\Users\\atahu\\Documents\\SD\\DOWNLOAD";
-    private static final String LL_FILES_PATH = "/home/atahualpasf/Documents/SD/LOCAL";
-    private static final String DL_FILES_PATH = "/home/atahualpasf/Documents/SD/DOWNLOAD";
+    private static final String LW_FILES_PATH = "SD\\LOCAL";
+    private static final String DW_FILES_PATH = "SD\\DOWNLOAD";    
+    private static final String LL_FILES_PATH = "SD/LOCAL";
+    private static final String DL_FILES_PATH = "SD/DOWNLOAD";
     private static final String W_DIR_SEPARATOR = "\\";
     private static final String L_DIR_SEPARATOR = "/";
 
@@ -44,6 +44,9 @@ public class Util {
     public static final String GHOST_IP         = "192.168.0.107";
     public static final Integer GHOST_PORT      = 5555;
     public static final String CMD_DELIMETER    = ":";
+    public static Integer THREAD_TIMEOUT = 200;
+    public static Integer SOCKET_TIMEOUT = 10000;
+    public static Integer SOCKET_TIMEOUT_DOWNLOAD = 900000;
     public static final String SUBCMD_DELIMETER = ";";
 
     // Constantes para mostrar colores en la consola
@@ -128,9 +131,9 @@ public class Util {
      * @param node Nodo del que se necesita leer la información.
      * @return JSON
      */
-    public static String prettyFormat(Node node) {
+    public static String prettyFormat(Object obj) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(node);
+        String json = gson.toJson(obj);
         System.out.println(json);
         return json;
     }

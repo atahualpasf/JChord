@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Atahualpa Silva F. <https://github.com/atahualpasf>
  * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
  */
-public class Archive implements Serializable {
+public class Archive implements Serializable, Comparable<Archive> {
     private Integer key;
     private String name;
 
@@ -61,4 +61,9 @@ public class Archive implements Serializable {
     public String toString() {
         return "Archive{" + "key=" + key + ", name=" + name + '}';
     }    
+
+    @Override
+    public int compareTo(Archive a) {
+        return this.key.compareTo(a.getKey());
+    }
 }

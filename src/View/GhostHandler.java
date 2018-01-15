@@ -14,8 +14,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -49,10 +50,12 @@ public class GhostHandler extends Thread {
                     switch(protocol[1]) {
                         case "JOIN":
                             GhostHandlerController.joinRing(clientRequest, ring, objectToClient);
+                            Thread.sleep(Util.THREAD_TIMEOUT);
                             GhostHandlerController.notifyRingNodes(ring);
                             break;
                         case "LEAVE":
                             GhostHandlerController.leaveRing(clientRequest, ring, objectToClient);
+                            Thread.sleep(Util.THREAD_TIMEOUT);
                             GhostHandlerController.notifyRingNodes(ring);
                         default:
                             break;
@@ -66,6 +69,8 @@ public class GhostHandler extends Thread {
         } catch(IOException e) {
             System.out.print(Util.ANSI_RED + "EXCEPTION: IOException ");
             System.out.println(Util.ANSI_RESET + e.getMessage());
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GhostHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -15,9 +15,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +37,8 @@ public class JChordController {
             try {
                 openConnection(Util.GHOST_IP, Util.GHOST_PORT);
                 Node me = new Node(Util.getMyIp(), Util.MY_PORT);
+                me.setLocalFiles(loadArchives());
+                System.out.println(me);
                 me.setKey(Util.hashCode(me));
                 StandardObject request = new StandardObject(me, true)
                         .buildProtocol(Arrays.asList("1","JOIN"));
@@ -47,6 +50,7 @@ public class JChordController {
                     Data.setMyNode(me);
                 }
                 connection.close();
+                loadArchives();
                 if (me.getPredecessor() != null) updateNodeRelations(me, true, true);
                 if (me.getSuccessor() != null) updateNodeRelations(me, true, false);
             } catch (IOException ex) {
@@ -89,26 +93,23 @@ public class JChordController {
         }
     }
     
-    public static void loadArchives() {
-        if (Data.getMyNode() != null) {
-            File[] files = new File(Util.getLocalDirPath()).listFiles();        
-            String resource;
-            if (files != null){
-                for (File file : files){
-                    if (file.isFile()){
-                        Archive archive = new Archive(Util.hashCode(file.getName()), file.getName());
-                        Data.getFiles().add(archive);
-                    }
+    private static List<Archive> loadArchives() {
+        List<Archive> archiveList = new ArrayList<>();
+        File[] files = new File(Util.getLocalDirPath()).listFiles();
+        if (files != null){
+            for (File file : files){
+                if (file.isFile()){
+                    Archive archive = new Archive(Util.hashCode(file.getName()), file.getName());
+                    archiveList.add(archive);
                 }
             }
-        } else {
-            System.out.println(Util.ANSI_RED + "ERROR:" + Util.ANSI_RESET + " Cliente -> Por favor inicie sesión primero.");
         }
+        return archiveList;
     }
     
     public static void showLocalArchives() {
         if (Data.getMyNode() != null) {
-            Data.getFiles().forEach((archive) -> {
+            Data.getMyNode().getLocalFiles().forEach((archive) -> {
                 System.out.println(archive);
             });
         } else {
@@ -118,21 +119,49 @@ public class JChordController {
     
     public static void lookupArchive() {
         if (Data.getMyNode() != null && Data.getMyNode().getPredecessor() != null && Data.getMyNode().getSuccessor() != null) {
-            try {
-                String filename = KeyIn.inString("|\t\t   NOMBRE DE ARCHIVO ->");
-                Integer keyFile = Util.hashCode(filename);
-                Archive archiveToLookup = new Archive(keyFile, filename);
-                Node me = new Node(Data.getMyNode());
-                Node nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
-                openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
-                StandardObject request = new StandardObject(me, true)
-                        .buildProtocol(Arrays.asList("4","LOOKUP"));
-                outputObject.writeObject(request);
-                request = new StandardObject(archiveToLookup, true);
-                outputObject.writeObject(request);
-                connection.close();
-            } catch (IOException ex) {
-                Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+            String filename = KeyIn.inString("|\t\t   NOMBRE DE ARCHIVO ->");
+            Integer keyFile = Util.hashCode(filename);
+            Archive archiveToLookup = new Archive(keyFile, filename);
+            Node me = new Node(Data.getMyNode(), true);
+            System.out.println(keyFile);
+            if (!Data.getMyNode().getLocalFiles().contains(archiveToLookup)) {
+                if (!Data.getMyNode().getRemoteFilesTable().containsKey(archiveToLookup)) {
+                    System.out.println("YO NO SE QUIEN LO TIENE, PERO SE QUIEN PUEDE INFORMAR");
+                    Node nodeToAsk;
+                    try {
+                        nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(keyFile).getValue();
+                    } catch(NullPointerException e) {
+                        nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
+                    }
+                    System.out.println("NODETOASK " + nodeToAsk);
+                    /*openConnection(nodeToAsk.getIp(), nodeToAsk.getPort());
+                    StandardObject request = new StandardObject(me, true)
+                    .buildProtocol(Arrays.asList("4","LOOKUP"));
+                    outputObject.writeObject(request);
+                    request = new StandardObject(archiveToLookup, true);
+                    outputObject.writeObject(request);
+                    connection.close();*/
+                } else {
+                    try {
+                        System.out.println("YO INFORMO");
+                        List<Node> listNode = Data.getMyNode().getRemoteFilesTable().get(archiveToLookup);
+                        Random randomIndex = new Random();
+                        Node nodeSelected = listNode.get(randomIndex.nextInt(listNode.size()));
+                        StandardObject request = new StandardObject(me,true)
+                                .buildProtocol(Arrays.asList("6","SENDFILE"));
+                        Socket connection = new Socket(nodeSelected.getIp(), nodeSelected.getPort());
+                        connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
+                        ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
+                        objectToSend.writeObject(request);                        
+                        request = new StandardObject(archiveToLookup,true);
+                        objectToSend.writeObject(request);
+                    } catch (IOException ex) {
+                        Logger.getLogger(JChordController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else {
+                System.out.print(Util.ANSI_BLUE + "INFORMACIÓN: " + Util.ANSI_RESET);
+                System.out.println("Disculpe pero ya posee el archivo " + Util.ANSI_BLUE + archiveToLookup.getName());
             }
         } else {
             if (Data.getMyNode() == null)
@@ -174,6 +203,7 @@ public class JChordController {
     private static void openConnection(String ip, Integer port) {
         try {
             connection = new Socket(ip, port);
+            connection.setSoTimeout(Util.SOCKET_TIMEOUT);
             outputObject = new ObjectOutputStream(connection.getOutputStream());
             inputObject = new ObjectInputStream(connection.getInputStream());
         } catch (IOException ex) {

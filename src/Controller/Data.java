@@ -23,7 +23,6 @@ import java.util.List;
 public class Data {
 
     private static Node me = null;
-    private static List<Archive> files = new ArrayList<>();
 
     /**
      * Obtiene la información de un nodo.
@@ -41,23 +40,5 @@ public class Data {
      */
     public static void setMyNode(Node me) {
         Data.me = me;
-    }
-
-    /**
-     * Obtiene los archivos que se encuentran en el nodo.
-     *
-     * @return Lista que contiene los archivos.
-     */
-    public static List<Archive> getFiles() {
-        return files;
-    }
-
-    /**
-     * Setea los archivos de una lista.
-     *
-     * @param files Lista que contiene los archivos y se necesita setear.
-     */
-    public static void setFiles(List<Archive> files) {
-        Data.files = files;
     }
 }

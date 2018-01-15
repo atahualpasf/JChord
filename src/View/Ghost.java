@@ -103,6 +103,7 @@ class DemonGhost extends Thread {
             while (true) {
                 ghostClient = ghostServer.accept();
                 Util.showMessage(2, 2, this.getClass().getSimpleName(), ghostClient.getInetAddress().getHostAddress() + ":" + ghostClient.getPort());
+                ghostClient.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
                 new GhostHandler(ghostClient, ring).start();
             }
         } catch (UnknownHostException ex) {
