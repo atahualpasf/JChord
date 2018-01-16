@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package View;
 
 import Controller.Util;
@@ -16,7 +15,7 @@ import java.net.Socket;
 
 /**
  * Clase que se encarga de recibir un archivo.
- * 
+ *
  * @author Atahualpa Silva F.
  * @link https://github.com/atahualpasf
  * <br> 
@@ -24,20 +23,20 @@ import java.net.Socket;
  * @link https://github.com/andrecontdi
  */
 public class ReceiveFile extends Thread {
-    
+
     private Socket socket;
     private Archive archive;
     private long tamañoArchivo;
     private long descargadoDelArchivo;
     private long byteInicio;
     private FileOutputStream out = null;
-    private ObjectInputStream dis=null;
-    
+    private ObjectInputStream dis = null;
+
     /**
      * Constructor de la clase.
-     * 
-     * @param socket 
-     * @param dis 
+     *
+     * @param socket
+     * @param dis
      * @param archive
      */
     public ReceiveFile(Socket socket, ObjectInputStream dis, Archive archive) {
@@ -46,92 +45,104 @@ public class ReceiveFile extends Thread {
         this.byteInicio = 0;
         this.dis = dis;
     }
-    
+
     /**
      * Devuelve si la descarga termino
-     * 
+     *
      * @return true Si la descarga termino
      */
-    public boolean descargaTerminada(){ 
-        return tamañoArchivo==descargadoDelArchivo; 
+    public boolean descargaTerminada() {
+        return tamañoArchivo == descargadoDelArchivo;
     }
-    
+
     /**
      * Devuelve la cantidad de bytes descargados hasta ahora
-     * 
+     *
      * @return Cantidad de bytes descargados
      */
     public long descargadoDelArchivo() {
         return descargadoDelArchivo;
     }
-    
+
     /**
      * Método que se encarga de obtener el byte de inicio.
-     * 
+     *
      * @return Byte de Inicio.
      */
     public long getByteInicio() {
         return byteInicio;
     }
-    
+
     /**
      * Método que se encarga de cerrar todas las conexiones.
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
-    public void Stop()throws IOException{
-        if (socket != null) {socket.close();};
-        if (out != null) {out.close();};
-        if (dis!=null)  {dis.close(); ;}
+    public void Stop() throws IOException {
+        if (socket != null) {
+            socket.close();
+        };
+        if (out != null) {
+            out.close();
+        };
+        if (dis != null) {
+            dis.close();;
+        }
         this.stop();
     }
-    
+
     @Override
     public void run() {
-        System.out.println("ENTRÓ AQUI EN EL RUN DEL RECEIVER");
-        
+        Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), "Entered into method RUN().");
+
         byte[] bytes = new byte[512]; // 1/2 kb
 
         int count;
 
         try {
-            try {  
-                if (byteInicio==0){
-                    out = new FileOutputStream(Util.getDownloadDirPath() + Util.getOsDirSeparator() + 
-                        archive.getName());
+            try {
+                if (byteInicio == 0) {
+                    out = new FileOutputStream(Util.getDownloadDirPath() + Util.getOsDirSeparator()
+                            + archive.getName());
                 } else {
-                    out = new FileOutputStream(Util.getDownloadDirPath() + Util.getOsDirSeparator() + 
-                            archive.getName(), true); 
+                    out = new FileOutputStream(Util.getDownloadDirPath() + Util.getOsDirSeparator()
+                            + archive.getName(), true);
                 }
             } catch (FileNotFoundException ex) {
-                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "No se encontró el archivo. " + ex.getMessage()); 
+                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "The file " + Util.ANSI_CYAN + archive.getName() + Util.ANSI_RESET + " was not found " );
             }
             tamañoArchivo = dis.readLong();
             descargadoDelArchivo = this.byteInicio;
 
-            int  display=10;
+            int display = 10;
             while ((count = dis.read(bytes)) > 0) {
-                if ( (descargadoDelArchivo*100/tamañoArchivo)>display){
-                    System.out.println(this.archive.getName()+" "+(descargadoDelArchivo*100/tamañoArchivo)+"%");
-                    display=display+10;
+                if ((descargadoDelArchivo * 100 / tamañoArchivo) > display) {
+                    Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), this.archive.getName() + " " + (descargadoDelArchivo * 100 / tamañoArchivo) + "%");
+                    display = display + 10;
                 }
-             //    System.out.println(this.nombreLibro+" "+(contador/length)+"%");
-                descargadoDelArchivo= descargadoDelArchivo +count;
+                //    System.out.println(this.nombreLibro+" "+(contador/length)+"%");
+                descargadoDelArchivo = descargadoDelArchivo + count;
                 out.write(bytes, 0, count);
             }
-            System.out.println(this.archive.getName()+" "+(descargadoDelArchivo*100/tamañoArchivo)+"%");
+            Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), this.archive.getName() + " " + (descargadoDelArchivo * 100 / tamañoArchivo) + "%");
         } catch (IOException e) {
-            Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "Upps se callo la descarga. "); 
-        }finally{
-            try{
-                if (socket != null) {socket.close();};
-                if (out != null) {out.close();};
-                if (dis!=null)  {dis.close(); ;}
+            Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "Upps the download failed. ");
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                };
+                if (out != null) {
+                    out.close();
+                };
+                if (dis != null) {
+                    dis.close();;
+                }
                 this.stop();
             } catch (IOException e) {
-                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), e.getMessage()); 
+                Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "IOException " + e.getMessage());
             }
         }
-        Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), "Descarga terminada: " + this.archive.getName()); 
+        Util.showMessage(2, 3, ReceiveFile.class.getSimpleName(), "Download completed " + this.archive.getName());
     }
 }

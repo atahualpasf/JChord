@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package View;
 
 import Controller.Data;
@@ -19,28 +18,35 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
- * @author Atahualpa Silva F. <https://github.com/atahualpasf>
- * @author Andrea L. Contreras D. <https://github.com/andrecontdi>
+ * Clase que se encarga de manejar los servidores 
+ * 
+ * @author Atahualpa Silva F.
+ * @link https://github.com/atahualpasf
+ * <br> 
+ * @author Andrea L. Contreras D.
+ * @link https://github.com/andrecontdi
  */
 public class ServerHandler extends Thread {
+
     private final Socket nodeClient;
     private StandardObject clientRequest = null;
     private StandardObject serverReply = null;
     private ObjectInputStream objectFromClient = null;
     private ObjectOutputStream objectToClient = null;
-    
+
+    /**
+     * Constructor de la clase.
+     * 
+     * @param nodeClient Nodo cliente.
+     */
     public ServerHandler(Socket nodeClient) {
         this.nodeClient = nodeClient;
     }
-    
+
     @Override
-    public void run()   
-    {
+    public void run() {
         try {
             objectFromClient = new ObjectInputStream(nodeClient.getInputStream());
             objectToClient = new ObjectOutputStream(nodeClient.getOutputStream());
@@ -49,10 +55,10 @@ public class ServerHandler extends Thread {
                 System.out.println(clientRequest);
                 String protocol[] = clientRequest.getProtocol().split(Util.CMD_DELIMETER);
                 if (protocol[1] != null) {
-                    switch(protocol[1]) {
+                    switch (protocol[1]) {
                         case "JOIN":
                             Node newNode = new Node((Node) clientRequest.getObject());
-                            switch(protocol[2]) {
+                            switch (protocol[2]) {
                                 case "PREDECESSOR":
                                     Data.getMyNode().setSuccessor(newNode);
                                     break;
@@ -63,7 +69,7 @@ public class ServerHandler extends Thread {
                             break;
                         case "LEAVE":
                             Node oldNode = (Node) clientRequest.getObject();
-                            switch(protocol[2]) {
+                            switch (protocol[2]) {
                                 case "PREDECESSOR":
                                     Data.getMyNode().setSuccessor(oldNode.getSuccessor());
                                     break;
@@ -77,8 +83,8 @@ public class ServerHandler extends Thread {
                             }
                             break;
                         case "FIXFINGERS":
-                            TreeMap<Integer,Node> fingerTable = (TreeMap<Integer,Node>) clientRequest.getObject();
-                            TreeMap<Archive,List<Node>> filesTable = (TreeMap<Archive,List<Node>>) ((StandardObject) objectFromClient.readObject()).getObject();
+                            TreeMap<Integer, Node> fingerTable = (TreeMap<Integer, Node>) clientRequest.getObject();
+                            TreeMap<Archive, List<Node>> filesTable = (TreeMap<Archive, List<Node>>) ((StandardObject) objectFromClient.readObject()).getObject();
                             Data.getMyNode().setFingerTable(fingerTable);
                             Data.getMyNode().setRemoteFilesTable(filesTable);
                             break;
@@ -89,8 +95,8 @@ public class ServerHandler extends Thread {
                                 if (!Data.getMyNode().getRemoteFilesTable().containsKey(archiveToLookup)) {
                                     if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
                                         if (Data.getMyNode().getPredecessor().getKey() < archiveToLookup.getKey()) {
-                                            StandardObject request = new StandardObject(archiveToLookup,true)
-                                            .buildProtocol(Arrays.asList("5","FILENOTFOUND"));
+                                            StandardObject request = new StandardObject(archiveToLookup, true)
+                                                    .buildProtocol(Arrays.asList("5", "FILENOTFOUND"));
                                             Socket connection = new Socket(nodeToReply.getIp(), nodeToReply.getPort());
                                             connection.setSoTimeout(Util.SOCKET_TIMEOUT);
                                             ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
@@ -99,12 +105,12 @@ public class ServerHandler extends Thread {
                                             Node nodeToAsk;
                                             try {
                                                 nodeToAsk = Data.getMyNode().getFingerTable().lowerEntry(archiveToLookup.getKey()).getValue();
-                                            } catch(NullPointerException e) {
+                                            } catch (NullPointerException e) {
                                                 nodeToAsk = Data.getMyNode().getFingerTable().lastEntry().getValue();
                                             }
-                                            System.out.println("NODETOASK " + nodeToAsk);
+                                            Util.showMessage(3, 3, ServerHandler.class.getSimpleName(), "Node to ask: " + nodeToAsk);
                                             StandardObject request = new StandardObject(nodeToReply, true)
-                                                    .buildProtocol(Arrays.asList("4","LOOKUP"));
+                                                    .buildProtocol(Arrays.asList("4", "LOOKUP"));
                                             Socket connection = new Socket(nodeToAsk.getIp(), nodeToAsk.getPort());
                                             connection.setSoTimeout(Util.SOCKET_TIMEOUT);
                                             ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
@@ -113,37 +119,37 @@ public class ServerHandler extends Thread {
                                             objectToSend.writeObject(request);
                                         }
                                     } else {
-                                        StandardObject request = new StandardObject(archiveToLookup,true)
-                                            .buildProtocol(Arrays.asList("5","FILENOTFOUND"));
+                                        StandardObject request = new StandardObject(archiveToLookup, true)
+                                                .buildProtocol(Arrays.asList("5", "FILENOTFOUND"));
                                         Socket connection = new Socket(nodeToReply.getIp(), nodeToReply.getPort());
                                         connection.setSoTimeout(Util.SOCKET_TIMEOUT);
                                         ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
                                         objectToSend.writeObject(request);
                                     }
                                 } else {
-                                    System.out.println("YO LE DIGO A QUIEN LO TIENE QUE LO ENVÍE");
+                                    Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), "I tell who has the archive to send it.");
                                     List<Node> listNode = Data.getMyNode().getRemoteFilesTable().get(archiveToLookup);
                                     Random randomIndex = new Random();
                                     Node nodeSelected = listNode.get(randomIndex.nextInt(listNode.size()));
-                                    StandardObject request = new StandardObject(nodeToReply,true)
-                                            .buildProtocol(Arrays.asList("6","SENDFILE"));
+                                    StandardObject request = new StandardObject(nodeToReply, true)
+                                            .buildProtocol(Arrays.asList("6", "SENDFILE"));
                                     Socket connection = new Socket(nodeSelected.getIp(), nodeSelected.getPort());
                                     connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
                                     ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
-                                    objectToSend.writeObject(request);                        
-                                    request = new StandardObject(archiveToLookup,true);
+                                    objectToSend.writeObject(request);
+                                    request = new StandardObject(archiveToLookup, true);
                                     objectToSend.writeObject(request);
                                 }
                             } else {
-                                System.out.println("YO SOY QUIEN LA TIENE");
+                                Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), "I have the file you are looking for");
                                 Node me = new Node(Data.getMyNode(), true);
-                                StandardObject request = new StandardObject(nodeToReply,true)
-                                        .buildProtocol(Arrays.asList("6","SENDFILE"));
+                                StandardObject request = new StandardObject(nodeToReply, true)
+                                        .buildProtocol(Arrays.asList("6", "SENDFILE"));
                                 Socket connection = new Socket(me.getIp(), me.getPort());
                                 connection.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
                                 ObjectOutputStream objectToSend = new ObjectOutputStream(connection.getOutputStream());
-                                objectToSend.writeObject(request);                        
-                                request = new StandardObject(archiveToLookup,true);
+                                objectToSend.writeObject(request);
+                                request = new StandardObject(archiveToLookup, true);
                                 objectToSend.writeObject(request);
                             }
                             /*if (Data.getMyNode().getKey() < archiveToLookup.getKey()) {
@@ -181,17 +187,16 @@ public class ServerHandler extends Thread {
                             break;
                         case "FILENOTFOUND":
                             Archive archive = (Archive) clientRequest.getObject();
-                            System.out.print(Util.ANSI_BLUE + "INFORMACIÓN:" + Util.ANSI_RESET + " Cliente -> " + nodeClient.getInetAddress().getHostAddress() + ":" + nodeClient.getPort() + " dice: ");
-                            System.out.println("Disculpe pero el archivo " + Util.ANSI_BLUE + archive.getName() + Util.ANSI_RESET +
-                                    " no se encuentra en el anillo.");
+                            Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), nodeClient.getInetAddress().getHostAddress() + ":" + nodeClient.getPort() + " says: " + "The file " + Util.ANSI_CYAN + archive.getName() + Util.ANSI_RESET + " was not found " );
+                new ServerHandler(nodeClient).start();
                             break;
                         case "SENDFILE":
-                            System.out.println("Entro a SENDFILE");
+                            Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), "Entered to SENFILE");
                             Node nodeWannaFile = (Node) clientRequest.getObject();
                             Archive archiveToSend = (Archive) ((StandardObject) objectFromClient.readObject()).getObject();
-                            StandardObject request = new StandardObject(archiveToSend,true)
-                                .buildProtocol(Arrays.asList("7","DOWNLOAD"));
-                            Socket socket = new Socket(nodeWannaFile.getIp(),nodeWannaFile.getPort());
+                            StandardObject request = new StandardObject(archiveToSend, true)
+                                    .buildProtocol(Arrays.asList("7", "DOWNLOAD"));
+                            Socket socket = new Socket(nodeWannaFile.getIp(), nodeWannaFile.getPort());
                             socket.setSoTimeout(Util.SOCKET_TIMEOUT_DOWNLOAD);
                             ObjectOutputStream objectToSend = new ObjectOutputStream(socket.getOutputStream());
                             ObjectInputStream objectToReceive = new ObjectInputStream(socket.getInputStream());
@@ -200,24 +205,21 @@ public class ServerHandler extends Thread {
                             sendFile.start();
                             break;
                         case "DOWNLOAD":
-                            System.out.println("Entro a DOWNLOAD");
+                            Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), "Entered to DOWNLOAD");
                             Archive archiveToDownload = (Archive) clientRequest.getObject();
                             ReceiveFile receiverFile = new ReceiveFile(this.nodeClient, objectFromClient, archiveToDownload);
                             receiverFile.start();
                             break;
                         default:
-                            System.out.println("Comando no válido");
+                            Util.showMessage(2, 3, ServerHandler.class.getSimpleName(), "Invalid command");
                             break;
                     }
                 }
             }
-        }
-        catch (ClassNotFoundException e) {
-            System.out.print(Util.ANSI_RED + "EXCEPTION: ClassNotFoundException ");
-            System.out.println(Util.ANSI_RESET + e.getMessage());
-        } catch(IOException e) {
-            System.out.print(Util.ANSI_RED + "EXCEPTION: IOException ");
-            System.out.println(Util.ANSI_RESET + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            Util.showMessage(3, 3, ServerHandler.class.getSimpleName(), "ClassNotFoundException " + e.getMessage());
+        } catch (IOException e) {
+            Util.showMessage(3, 3, ServerHandler.class.getSimpleName(), "IOException " + e.getMessage());
         }
     }
 }

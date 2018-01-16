@@ -37,28 +37,28 @@ public class Util {
     private static final String L_DIR_SEPARATOR = "/";
 
     // Constantes de aplicación
-    public static Integer MAX_NODES             = null;
-    public static final Integer M_BITS          = 8;
-    private static String MY_IP                 = null;
-    public static final Integer MY_PORT         = 4444;
-    public static final String GHOST_IP         = "192.168.0.110";
-    public static final Integer GHOST_PORT      = 5555;
-    public static final String CMD_DELIMETER    = ":";
+    public static Integer MAX_NODES = null;
+    public static final Integer M_BITS = 8;
+    private static String MY_IP = null;
+    public static final Integer MY_PORT = 4444;
+    public static final String GHOST_IP = "192.168.0.105";
+    public static final Integer GHOST_PORT = 5555;
+    public static final String CMD_DELIMETER = ":";
     public static Integer THREAD_TIMEOUT = 200;
     public static Integer SOCKET_TIMEOUT = 10000;
     public static Integer SOCKET_TIMEOUT_DOWNLOAD = 900000;
     public static final String SUBCMD_DELIMETER = ";";
 
     // Constantes para mostrar colores en la consola
-    public static final String ANSI_RESET   = "\u001B[0m";
-    public static final String ANSI_BLACK   = "\u001B[30m";
-    public static final String ANSI_RED     = "\u001B[31m";
-    public static final String ANSI_GREEN   = "\u001B[32m";
-    public static final String ANSI_YELLOW  = "\u001B[33m";
-    public static final String ANSI_BLUE    = "\u001B[34m";
-    public static final String ANSI_PURPLE  = "\u001B[35m";
-    public static final String ANSI_CYAN    = "\u001B[36m";
-    public static final String ANSI_WHITE   = "\u001B[37m";
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
     public static final int MENU_TITLE_LENGTH = 14;
 
     /**
@@ -128,7 +128,7 @@ public class Util {
      * Método que se encarga de imprimir en formato Gson para que sea más fácil
      * de leer la información de cada nodo.
      *
-     * @param node Nodo del que se necesita leer la información.
+     * @param obj Nodo del que se necesita leer la información.
      * @return JSON
      */
     public static String prettyFormat(Object obj) {
@@ -234,67 +234,91 @@ public class Util {
      */
     public static void showServerMessage(String name, boolean start) {
         name = (name.length() < 5) ? " " + name : name;
-        System.out.println(     " ---------------  ");
-        System.out.println(     "|     " + ANSI_CYAN + name + ANSI_RESET + "     |");
-        System.out.println(     "|  -----------  |");
-        System.out.println(     "| |           | |");
+        System.out.println(" ---------------  ");
+        System.out.println("|     " + ANSI_CYAN + name + ANSI_RESET + "     |");
+        System.out.println("|  -----------  |");
+        System.out.println("| |           | |");
         if (start) {
-            System.out.println( "| |  ^     ^  | |");
+            System.out.println("| |  ^     ^  | |");
         } else {
-            System.out.println( "| |  X     X  | |");
+            System.out.println("| |  X     X  | |");
         }
-        System.out.println(     "| |     -     | |");
+        System.out.println("| |     -     | |");
         if (start) {
-            System.out.println( "| |    ---    | |");
+            System.out.println("| |    ---    | |");
         } else {
-            System.out.println( "| |     O     | |");
+            System.out.println("| |     O     | |");
         }
-        System.out.println(     "|  -----------  |");
+        System.out.println("|  -----------  |");
         if (start) {
-            System.out.println( "|" + " SERVER" + ":" + ANSI_GREEN + "   ON" + ANSI_RESET + "  |");
+            System.out.println("|" + " SERVER" + ":" + ANSI_GREEN + "   ON" + ANSI_RESET + "  |");
         } else {
-            System.out.println( "|" + " SERVER" + ":" + ANSI_RED + "  OFF" + ANSI_RESET + "  |");
+            System.out.println("|" + " SERVER" + ":" + ANSI_RED + "  OFF" + ANSI_RESET + "  |");
         }
-        System.out.println(     "| --      ----- |");
-        System.out.println(     "| " + ANSI_CYAN + Util.getMyIp() + ANSI_RESET + " |");
-        System.out.println(     " --------------- ");
+        System.out.println("| --      ----- |");
+        System.out.println("| " + ANSI_CYAN + Util.getMyIp() + ANSI_RESET + " |");
+        System.out.println(" --------------- ");
     }
 
     /**
      * Método para realizar impresiones de forma genérica.
      *
-     * @param status Status del mensaje: 
-     * <br>1 Exitoso. 
-     * <br>2 Información. 
-     * <br>3 Excepción. 
+     * @param status Status del mensaje:
+     * <br>1 Exitoso.
+     * <br>2 Información.
+     * <br>3 Excepción.
      * <br>4 Error.
      * @param server Indica de quien es la información a imprimir:
-     * <br>1 Servidor. 
-     * <br>2 Cliente. 
-     * <br>3 Ninguno de los anteriores. 
+     * <br>1 Servidor.
+     * <br>2 Cliente.
+     * <br>3 Ninguno de los anteriores.
      * @param origin Clase de donde proviene la información/mensaje.
      * @param message Mesanje a mostrar.
      */
     public static void showMessage(int status, int server, String origin, String message) {
         if (status == 1) {
-            if (server == 1) System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " Server -> " + message);
-            if (server == 2) System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " Client  -> " + message);
-            if (server == 3) System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " " + message);
+            if (server == 1) {
+                System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " Server -> " + message);
+            }
+            if (server == 2) {
+                System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " Client -> " + message);
+            }
+            if (server == 3) {
+                System.out.println(ANSI_GREEN + "SUCCESS:" + ANSI_RESET + " " + message);
+            }
         }
         if (status == 2) {
-            if (server == 1) System.out.println(ANSI_CYAN+ "INFORMATION from " + origin + ":" + ANSI_RESET + " Server -> " + message);
-            if (server == 2) System.out.println(ANSI_CYAN + "INFORMATION from " + origin + ":" + ANSI_RESET + " Client  -> " + message);
-            if (server == 3) System.out.println(ANSI_CYAN + "INFORMATION from " + origin + ":" + ANSI_RESET + " " + message);
+            if (server == 1) {
+                System.out.println(ANSI_CYAN + "INFORMATION from " + origin + ":" + ANSI_RESET + " Server -> " + message);
+            }
+            if (server == 2) {
+                System.out.println(ANSI_CYAN + "INFORMATION from " + origin + ":" + ANSI_RESET + " Client -> " + message);
+            }
+            if (server == 3) {
+                System.out.println(ANSI_CYAN + "INFORMATION from " + origin + ":" + ANSI_RESET + " " + message);
+            }
         }
         if (status == 3) {
-            if (server == 1) System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " Server -> " + message);
-            if (server == 2) System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " Client  -> " + message);
-            if (server == 3) System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " " + message);
+            if (server == 1) {
+                System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " Server -> " + message);
+            }
+            if (server == 2) {
+                System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " Client -> " + message);
+            }
+            if (server == 3) {
+                System.out.println(ANSI_YELLOW + "EXCEPTION from " + origin + ":" + ANSI_RESET + " " + message);
+            }
         }
         if (status == 4) {
-            if (server == 1) System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " Server -> " + message);
-            if (server == 2) System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " Client  -> " + message);
-            if (server == 3) System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " " + message);
+            if (server == 1) {
+                System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " Server -> " + message);
+            }
+            if (server == 2) {
+                System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " Client -> " + message);
+            }
+            if (server == 3) {
+                System.out.println(ANSI_RED + "ERROR from " + origin + ":" + ANSI_RESET + " " + message);
+            }
         }
     }
 }

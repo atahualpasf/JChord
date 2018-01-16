@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package View;
 
 import Controller.Data;
@@ -16,12 +15,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Clase que se encarga del envio del archivo.
- * 
+ *
  * @author Atahualpa Silva F.
  * @link https://github.com/atahualpasf
  * <br> 
@@ -29,7 +26,7 @@ import java.util.logging.Logger;
  * @link https://github.com/andrecontdi
  */
 public class SendFile extends Thread {
-    
+
     private Socket socket;
     private ObjectOutputStream dataOutputStream;
     private ObjectInputStream dataInputStream;
@@ -39,15 +36,15 @@ public class SendFile extends Thread {
     private int indiceLibro;
     //private ArrayList<DatosCliente> ListaClientes;
     private long byteInicio;
-    
+
     /**
      * Constructor de la clase.
-     * 
+     *
      * @param nodeSocket
      * @param dataOutputStream
      * @param dataInputStream
      * @param node
-     * @param archive 
+     * @param archive
      */
     public SendFile(Socket nodeSocket, ObjectOutputStream dataOutputStream, ObjectInputStream dataInputStream, Node node, Archive archive) {
         this.socket = nodeSocket;
@@ -59,21 +56,27 @@ public class SendFile extends Thread {
         this.archive = archive;
         this.byteInicio = 0;
     }
-    
+
     /**
      * Método que se encarga de cerrar todas las validaciones.
-     * 
+     *
      */
     public void Close() {
         try {
-            if (socket != null) {socket.close();};
-            if (dataInputStream!=null)  {dataInputStream.close(); ;}
-            if (dataOutputStream!=null) {dataOutputStream.close();}
+            if (socket != null) {
+                socket.close();
+            };
+            if (dataInputStream != null) {
+                dataInputStream.close();;
+            }
+            if (dataOutputStream != null) {
+                dataOutputStream.close();
+            }
         } catch (IOException ex) {
-            Logger.getLogger(SendFile.class.getName()).log(Level.SEVERE, null, ex);
+            Util.showMessage(3, 3, ReceiveFile.class.getSimpleName(), "IOException " + ex.getMessage());
         }
     }
-    
+
     @Override
     public void run() {
         // accion = dataInputStream.readUTF();
@@ -86,23 +89,23 @@ public class SendFile extends Thread {
         ClienteActual=ListaClientes.get(indiceCliente);
         }*/
         try {
-            System.out.println("El usuario " + node.getIp() + ":" + node.getPort() + " solicita " +
-                    archive.getName() + " de " + Data.getMyNode().getIp() + ":" + Data.getMyNode().getPort());
+            Util.showMessage(2, 3, SendFile.class.getSimpleName(), "\nThe user: " + node.getIp() + ":" + node.getPort() + 
+                    "\nRequest: " + archive.getName() + 
+                    "\nFrom:" + Data.getMyNode().getIp() + ":" + Data.getMyNode().getPort());
+            
             //this.indiceLibro=ListaLibros.indexOf(new DatosLibro(nombreLibro,autor));
             //ListaLibros.get(this.indiceLibro).sumarDescargando();
 
             //String pathLibro=this.path+"/"/*+(ListaLibros.get(this.indiceLibro).getNombreArchivo())*/;
             //dataOutputStream.writeUTF(ListaLibros.get(this.indiceLibro).getNombreArchivo());
             //System.out.println("Indice del libro "+indiceLibro);
-
             File file = new File(Util.getLocalDirPath() + Util.getOsDirSeparator() + archive.getName());
-            System.out.println(file.getAbsolutePath());
+            Util.showMessage(2, 3, SendFile.class.getSimpleName(), file.getAbsolutePath());
 
             // Get the size of the file
             long length = file.length();
             long sendedFromFile = byteInicio;
-            byte[] bytes = new byte[ 512]; // 1/2 kb
-
+            byte[] bytes = new byte[512]; // 1/2 kb
 
             FileInputStream in = new FileInputStream(file);
             in.skip(byteInicio);
@@ -115,20 +118,22 @@ public class SendFile extends Thread {
                 dataOutputStream.write(bytes, 0, count);
                 sendedFromFile = sendedFromFile + count;
             }
-            System.out.println("Enviado: " + sendedFromFile + " Tamano: "+length);
-            if (sendedFromFile == length){
-            //ListaLibros.get(this.indiceLibro).sumarDescarga();
+            System.out.println();
+            Util.showMessage(2, 3, SendFile.class.getSimpleName(), "\nSent: " + sendedFromFile + 
+                    "\nSize: " + length);
+            if (sendedFromFile == length) {
+                //ListaLibros.get(this.indiceLibro).sumarDescarga();
 
-            //ClienteActual.sumarCliente();
+                //ClienteActual.sumarCliente();
             }
             // System.out.println("  ");
         } catch (IOException ex) {
-            Logger.getLogger(SendFile.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Se callo la conexion: " + Data.getMyNode() + ".");
+            Util.showMessage(3, 3, SendFile.class.getSimpleName(), "IOException " + ex.getMessage());
+            Util.showMessage(3, 3, SendFile.class.getSimpleName(), "Upps the download failed " + Data.getMyNode() + ".");
             Close();
         } finally {
-                Close();
+            Close();
         }
-        System.out.println("Se desconecto "+ Data.getMyNode() + ".");
-    }  
+        Util.showMessage(2, 3, SendFile.class.getSimpleName(), "It disconnected " + Data.getMyNode() + ".");
+    }
 }

@@ -42,7 +42,7 @@ public class KeyIn {
                 dummy = System.in.read();
             }
         } catch (java.io.IOException e) {
-            Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error");
+            Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error.");
         }
     }
 
@@ -77,7 +77,7 @@ public class KeyIn {
                     s = s + (char) aChar; // Enter into string
                 }
             } catch (java.io.IOException e) {
-                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error");
+                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error, not a String.");
                 finished = true;
             }
         }
@@ -95,9 +95,9 @@ public class KeyIn {
             inputFlush();
             printPrompt(prompt);
             try {
-                return Integer.valueOf(inString().trim()).intValue();
+                return Integer.parseInt(inString().trim());
             } catch (NumberFormatException e) {
-                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Invalid input. Not an integer");
+                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Invalid input, not an integer.");
             }
         }
     }
@@ -117,7 +117,7 @@ public class KeyIn {
         try {
             aChar = System.in.read();
         } catch (java.io.IOException e) {
-            Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error");
+            Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Input error, no a char.");
         }
         inputFlush();
         return (char) aChar;
@@ -134,9 +134,9 @@ public class KeyIn {
             inputFlush();
             printPrompt(prompt);
             try {
-                return Double.valueOf(inString().trim()).doubleValue();
+                return Double.valueOf(inString().trim());
             } catch (NumberFormatException e) {
-                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Invalid input. Not a floating point number");
+                Util.showMessage(3, 3, KeyIn.class.getSimpleName(), "Invalid input. not a floating point number");
             }
         }
     }

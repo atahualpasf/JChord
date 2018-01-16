@@ -27,7 +27,7 @@ public class GhostController {
     public static void showStatusNetwork(List<Node> ring) {
         Util.showMessage(2, 3, GhostController.class.getSimpleName(), "Nodos en el anillo: " + ring.size());
         ring.forEach(node -> {
-            System.out.println(node);
+            Util.showMessage(2, 3, GhostController.class.getSimpleName(), node.toString());
         });
     }
 }

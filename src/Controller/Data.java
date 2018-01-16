@@ -5,10 +5,7 @@
  */
 package Controller;
 
-import Model.Archive;
 import Model.Node;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Clase que se encarga de a obtención y seteo de la información de los nodos y
